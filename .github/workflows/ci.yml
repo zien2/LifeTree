@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          # 以下环境变量为构建占位，生产请在仓库Secrets中配置真实值
+          JWT_SECRET: dummy_secret
+          AI_API_KEY: dummy_key
+          NEXT_PUBLIC_BASE_URL: http://localhost:3000
+        run: npm run build
+
+
