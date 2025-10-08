@@ -1,0 +1,434 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 0, 0, 0;
+}
+
+html, body {
+  background-color: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 深色Modal全局兜底：去掉白色内容背景与边框 */
+.ant-modal-content,
+.ant-modal-body,
+.ant-modal-header,
+.ant-modal-footer {
+  background: #0f0f0f !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.ant-modal-content {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 覆盖 Ant Design 通知组件样式 */
+.ant-notification-notice,
+.ant-notification-notice-wrapper,
+.ant-notification-notice-content {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ant-notification-notice-message {
+  color: #ffffff !important;
+  margin-bottom: 4px !important;
+}
+
+.ant-notification-notice-description {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-notification-notice-close {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* 覆盖 Ant Design 下拉菜单样式 */
+.ant-dropdown-menu {
+  background-color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ant-dropdown-menu-item {
+  color: #ffffff !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-dropdown-menu-item-divider {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-dropdown-menu-item-danger {
+  color: #ff4d4f !important;
+}
+
+/* 覆盖 Ant Design Select 组件样式 */
+.ant-select-dropdown {
+  background-color: #121212 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ant-select-item {
+  color: #ffffff !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: rgba(24, 144, 255, 0.2) !important;
+  color: #1890ff !important;
+}
+
+/* 覆盖 Ant Design Descriptions 组件样式 */
+.ant-descriptions-title {
+  color: #ffffff !important;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  background-color: #1f1f1f !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-descriptions-bordered .ant-descriptions-item-content {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-descriptions-bordered .ant-descriptions-view {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-descriptions-bordered .ant-descriptions-row {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-card {
+  background: #121212 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-card-head {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-card-head-title {
+  color: #ffffff !important;
+}
+
+.ant-typography {
+  color: #ffffff !important;
+}
+
+/* 年份视图样式 - 只在年份面板下生效（兼容 .ant-picker-month-panel / .ant-picker-year-panel） */
+.ant-picker-month-panel,
+.ant-picker-year-panel,
+.ant-picker-calendar-year-panel,
+.ant-picker-year-panel .ant-picker-calendar,
+.ant-picker-calendar-year-panel .ant-picker-calendar,
+.ant-picker-year-panel .ant-picker-panel,
+.ant-picker-calendar-year-panel .ant-picker-panel,
+.ant-picker-year-panel .ant-picker,
+.ant-picker-calendar-year-panel .ant-picker {
+  height: 80vh !important;
+  min-height: 600px !important;
+  max-height: none !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-content,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-content,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-content,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-content,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-content,
+.ant-picker-year-panel .ant-picker .ant-picker-content,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-content {
+  height: calc(100% - 60px) !important;
+  max-height: none !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-content table,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-content table,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-content table,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-content table,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-content table,
+.ant-picker-year-panel .ant-picker .ant-picker-content table,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-content table {
+  height: 100% !important;
+  table-layout: fixed !important;
+  max-height: none !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-content tbody,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-content tbody,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-content tbody,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-content tbody,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-content tbody,
+.ant-picker-year-panel .ant-picker .ant-picker-content tbody,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-content tbody {
+  height: 100% !important;
+  max-height: none !important;
+}
+
+/* 一行显示4个月份，所以是3行 - 只在年份面板下生效 */
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-content tbody tr,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-content tbody tr,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-content tbody tr,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-content tbody tr,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-content tbody tr,
+.ant-picker-year-panel .ant-picker .ant-picker-content tbody tr,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-content tbody tr {
+  height: 33.33% !important;
+  max-height: none !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-content tbody td,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-content tbody td,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-content tbody td,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-content tbody td,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-content tbody td,
+.ant-picker-year-panel .ant-picker .ant-picker-content tbody td,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-content tbody td {
+  height: 100% !important;
+  min-height: 200px !important;
+  max-height: none !important;
+  vertical-align: top !important;
+  padding: 4px !important;
+  width: 25% !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-cell,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-cell,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-cell,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-cell,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-cell,
+.ant-picker-year-panel .ant-picker .ant-picker-cell,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-cell {
+  height: 100% !important;
+  min-height: 200px !important;
+  max-height: none !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-cell-inner,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-cell-inner,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-cell-inner,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-cell-inner,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-cell-inner,
+.ant-picker-year-panel .ant-picker .ant-picker-cell-inner,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-cell-inner {
+  height: calc(100% - 8px) !important;
+  min-height: 190px !important;
+  max-height: none !important;
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  overflow: visible !important;
+}
+
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-calendar-date,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-calendar-date,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-calendar-date,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-calendar-date,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-calendar-date,
+.ant-picker-year-panel .ant-picker .ant-picker-calendar-date,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-calendar-date {
+  height: calc(100% - 8px) !important;
+  min-height: 190px !important;
+  max-height: none !important;
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  overflow: visible !important;
+}
+
+/* 年份视图月份内容样式优化 */
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-calendar-date-content,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-calendar-date-content,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-calendar-date-content,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-calendar-date-content,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-calendar-date-content,
+.ant-picker-year-panel .ant-picker .ant-picker-calendar-date-content,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-calendar-date-content {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  overflow: visible !important;
+  padding: 4px !important;
+}
+
+/* 年份视图月份统计信息样式 */
+.ant-picker-month-panel .ant-picker-calendar .ant-picker-calendar-date-content > div,
+.ant-picker-year-panel .ant-picker-calendar .ant-picker-calendar-date-content > div,
+.ant-picker-calendar-year-panel .ant-picker-calendar .ant-picker-calendar-date-content > div,
+.ant-picker-year-panel .ant-picker-panel .ant-picker-calendar-date-content > div,
+.ant-picker-calendar-year-panel .ant-picker-panel .ant-picker-calendar-date-content > div,
+.ant-picker-year-panel .ant-picker .ant-picker-calendar-date-content > div,
+.ant-picker-calendar-year-panel .ant-picker .ant-picker-calendar-date-content > div {
+  width: 100% !important;
+  margin: 2px 0 !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  overflow: visible !important;
+}
+
+/* 统计容器与行铺满整格 */
+.ant-picker-month-panel .month-plans-summary,
+.ant-picker-year-panel .month-plans-summary,
+.ant-picker-calendar-year-panel .month-plans-summary {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.ant-picker-month-panel .month-plans-summary > *,
+.ant-picker-year-panel .month-plans-summary > *,
+.ant-picker-calendar-year-panel .month-plans-summary > * {
+  width: 100% !important;
+}
+
+/* 强制所有年份视图相关元素 - 只在年份面板下生效 */
+.ant-picker-month-panel *,
+.ant-picker-year-panel *,
+.ant-picker-calendar-year-panel * {
+  max-height: none !important;
+}
+
+/* 强制年份视图布局 - 使用最高优先级覆盖Ant Design默认样式 */
+/* 仅在年份视图，让月份盒子里的内容铺满（不改变盒子尺寸与布局） */
+.ant-picker-year-panel .ant-picker-cell-inner,
+.ant-picker-calendar-year-panel .ant-picker-cell-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+.ant-picker-year-panel .month-plans-summary,
+.ant-picker-calendar-year-panel .month-plans-summary {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+/* 生命树快照日历样式 */
+.ant-picker-calendar {
+  background: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-header {
+  background: #1a1a1a !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-header .ant-picker-calendar-year-select,
+.ant-picker-calendar .ant-picker-calendar-header .ant-picker-calendar-month-select {
+  color: #fff !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-body {
+  background: #1a1a1a !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date:hover {
+  background: #2a2a2a !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date.ant-picker-calendar-date-today {
+  background: #1890ff !important;
+  color: #fff !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date.ant-picker-calendar-date-selected {
+  background: #52c41a !important;
+  color: #fff !important;
+}
+
+.ant-picker-calendar .ant-picker-calendar-date-content {
+  color: #fff !important;
+}
+
+/* AI聊天界面动画 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 消息气泡动画 */
+.chat-message {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* 加载状态动画 */
+.ai-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* 输入框聚焦效果 */
+.chat-input:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: #1890ff;
+}
+
+/* 按钮悬停效果 */
+.chat-send-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+}

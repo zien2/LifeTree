@@ -1,0 +1,56 @@
+{
+  "name": "lifetree",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "npx tsx prisma/seed.ts",
+    "cron:snapshot": "node scripts/daily-snapshot.js",
+    "cron:test": "node scripts/daily-snapshot.js --test",
+    "cron:tree-snapshot": "node scripts/dashboard-tree-snapshot.js",
+    "security:check": "node scripts/security-check.js",
+    "security:scan": "npm run security:check",
+    "test:ai-performance": "node scripts/test-ai-performance.js"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@ant-design/nextjs-registry": "^1.1.0",
+    "@prisma/client": "^5.14.0",
+    "@types/nodemailer": "^6.4.20",
+    "antd": "^5.17.0",
+    "axios": "^1.7.0",
+    "bcryptjs": "^2.4.3",
+    "dayjs": "^1.11.11",
+    "framer-motion": "^11.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "next": "^14.2.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.7",
+    "openai": "^4.47.0",
+    "puppeteer": "^24.23.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "recharts": "^3.2.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "prisma": "^5.14.0",
+    "typescript": "^5.4.5"
+  }
+}

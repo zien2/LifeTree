@@ -1,0 +1,185 @@
+// Prisma Schema for LifeTree - 生命树计划管理系统
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 用户表 ====================
+model User {
+  id                String    @id @default(cuid()) // 用户唯一标识ID
+  email             String    @unique @db.VarChar(255) // 用户邮箱，用于登录，必须唯一
+  password          String    @db.VarChar(255) // 用户密码（哈希加密后存储）
+  name              String?   @db.VarChar(100) // 用户昵称（可选）
+  emailVerified     Boolean   @default(false) // 邮箱是否已验证
+  verificationToken String?   @unique @db.VarChar(255) // 邮箱验证令牌
+  tokenExpiresAt    DateTime? // 验证令牌过期时间
+  createdAt         DateTime  @default(now()) // 账号创建时间
+  updatedAt         DateTime  @updatedAt // 账号信息最后更新时间
+
+  // 关联关系
+  plans         Plan[] // 用户创建的所有计划
+  notifications Notification[] // 用户收到的所有通知
+  aiAnalyses    AIAnalysis[] // 用户的所有AI分析记录
+  trees         Tree[] // 用户的所有生命树
+  dailySnapshots DailyPlanSnapshot[] // 用户的每日数据快照
+  
+  @@index([email]) // 邮箱索引，优化登录查询
+  @@index([verificationToken]) // 验证令牌索引
+  @@map("users") // 数据库表名
+}
+
+// ==================== 计划表 ====================
+model Plan {
+  id          String    @id @default(cuid()) // 计划唯一标识ID
+  title       String    @db.VarChar(255) // 计划标题
+  description String?   @db.Text // 计划详细描述（可选）
+  priority    String    @default("MEDIUM") @db.VarChar(50) // 优先级：HIGH(高)/MEDIUM(中)/LOW(低)
+  status      String    @default("PENDING") @db.VarChar(50) // 状态：PENDING(未完成)/COMPLETED(已完成)/OVERDUE(逾期)
+  startDate   DateTime? // 计划开始日期（可选，用于日历显示）
+  dueDate     DateTime? // 计划截止日期（可选）
+  completedAt DateTime? // 计划完成时间（完成时自动记录）
+  createdAt   DateTime  @default(now()) // 计划创建时间
+  updatedAt   DateTime  @updatedAt // 计划最后更新时间
+
+  // 关联关系
+  userId String // 所属用户ID
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户，用户删除时级联删除计划
+  
+  leaves Leaf[] // 计划对应的叶子（一个计划可能对应多个叶子状态记录）
+  
+  @@index([userId]) // 用户ID索引，优化用户计划查询
+  @@index([status]) // 状态索引，优化按状态筛选
+  @@index([startDate]) // 开始日期索引，优化日历查询
+  @@index([dueDate]) // 截止日期索引，优化逾期检查
+  @@map("plans") // 数据库表名
+}
+
+// ==================== AI分析表 ====================
+model AIAnalysis {
+  id        String   @id @default(cuid()) // AI分析记录唯一标识ID
+  type      String   @db.VarChar(50) // 分析类型：DAILY(每日)/WEEKLY(周)/MONTHLY(月)/CUSTOM(自定义问答)
+  content   String   @db.Text // AI分析的完整内容/建议
+  score     Int? // 成长性评分（1-5星，仅DAILY类型有效）
+  period    String?  @db.VarChar(50) // 周期标识：如"2024-W01"表示2024年第1周，"2024-01"表示2024年1月
+  createdAt DateTime @default(now()) // 分析生成时间
+
+  // 关联关系
+  userId String // 所属用户ID
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户，用户删除时级联删除分析记录
+  
+  @@index([userId]) // 用户ID索引
+  @@index([type]) // 分析类型索引
+  @@index([period]) // 周期索引，优化周期报告查询
+  @@map("ai_analyses") // 数据库表名
+}
+
+// ==================== 通知表 ====================
+model Notification {
+  id        String   @id @default(cuid()) // 通知唯一标识ID
+  title     String   @db.VarChar(255) // 通知标题
+  content   String   @db.Text // 通知详细内容
+  isRead    Boolean  @default(false) // 是否已读：true(已读)/false(未读)
+  type      String   @db.VarChar(50) // 通知类型：ANALYSIS(分析报告)/REMINDER(提醒)/SYSTEM(系统通知)
+  createdAt DateTime @default(now()) // 通知创建时间
+
+  // 关联关系
+  userId String // 接收通知的用户ID
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户，用户删除时级联删除通知
+  
+  @@index([userId]) // 用户ID索引
+  @@index([isRead]) // 已读状态索引，优化未读通知查询
+  @@map("notifications") // 数据库表名
+}
+
+// ==================== 生命树表 ====================
+model Tree {
+  id        String   @id @default(cuid()) // 生命树唯一标识ID
+  name      String   @db.VarChar(100) // 树的名称（如"2024年成长树"）
+  type      String   @default("DEFAULT") @db.VarChar(50) // 树的类型：DEFAULT(默认)/ANNUAL(年度)/CUSTOM(自定义)
+  health    Int      @default(100) // 树的健康度（0-100），根据计划完成情况动态计算
+  level     Int      @default(1) // 树的等级，随着完成计划数增加而提升
+  createdAt DateTime @default(now()) // 树创建时间
+  updatedAt DateTime @updatedAt // 树状态最后更新时间
+
+  // 关联关系
+  userId String // 所属用户ID
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户，用户删除时级联删除树
+  
+  leaves Leaf[] // 树上的所有叶子
+  
+  @@index([userId]) // 用户ID索引
+  @@map("trees") // 数据库表名
+}
+
+// ==================== 叶子表 ====================
+model Leaf {
+  id          String   @id @default(cuid()) // 叶子唯一标识ID
+  color       String   @db.VarChar(50) // 叶子颜色：green(绿色-已完成)/red(红色-高优先级)/yellow(黄色-中优先级)/blue(蓝色-低优先级)/brown(褐色-逾期)
+  status      String   @db.VarChar(50) // 叶子状态：GROWING(生长中)/FLOATING(飘动)/FALLING(飘落)/WITHERED(枯萎)
+  positionX   Float // 叶子在画布上的X坐标位置
+  positionY   Float // 叶子在画布上的Y坐标位置
+  rotation    Float    @default(0) // 叶子旋转角度（度数）
+  opacity     Float    @default(1.0) // 叶子透明度（0-1）
+  createdAt   DateTime @default(now()) // 叶子创建时间
+  updatedAt   DateTime @updatedAt // 叶子状态最后更新时间
+
+  // 关联关系
+  treeId String // 所属生命树ID
+  tree   Tree   @relation(fields: [treeId], references: [id], onDelete: Cascade) // 关联生命树，树删除时级联删除叶子
+  
+  planId String // 对应的计划ID
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade) // 关联计划，计划删除时级联删除叶子
+  
+  @@index([treeId]) // 树ID索引，优化查询某棵树的所有叶子
+  @@index([planId]) // 计划ID索引，优化查询某个计划的叶子
+  @@index([status]) // 状态索引
+  @@map("leaves") // 数据库表名
+}
+
+// ==================== 每日计划数据快照表 ====================
+// 用于AI分析的数据链路，记录每日计划统计信息
+model DailyPlanSnapshot {
+  id                    String   @id @default(cuid()) // 快照唯一标识ID
+  userId                String // 用户ID
+  snapshotDate          DateTime @db.Date // 快照日期
+  totalPlans            Int      @default(0) // 总计划数
+  completedPlans        Int      @default(0) // 已完成数
+  pendingPlans          Int      @default(0) // 待完成数
+  completionRate        Float    @default(0) // 完成率（0-100）
+  highPriorityPlans     Int      @default(0) // 高优先级计划数
+  mediumPriorityPlans   Int      @default(0) // 中优先级计划数
+  lowPriorityPlans      Int      @default(0) // 低优先级计划数
+  createdAt             DateTime @default(now()) // 快照创建时间
+  updatedAt             DateTime @updatedAt // 快照最后更新时间
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户
+  details DailyPlanDetail[] // 快照的详细计划记录
+
+  @@unique([userId, snapshotDate]) // 每个用户每天只能有一个快照
+  @@index([userId, snapshotDate]) // 用户和日期复合索引
+  @@map("daily_plan_snapshots") // 数据库表名
+}
+
+// ==================== 每日计划详情表 ====================
+// 用于更细粒度的AI分析，记录每日具体计划详情
+model DailyPlanDetail {
+  id           String   @id @default(cuid()) // 详情记录唯一标识ID
+  snapshotId   String // 所属快照ID
+  planId       String // 计划ID
+  title        String   @db.VarChar(255) // 计划标题
+  status       String   @db.VarChar(20) // 计划状态
+  priority     String   @db.VarChar(20) // 计划优先级
+  createdAt    DateTime @default(now()) // 记录创建时间
+
+  // 关联关系
+  snapshot DailyPlanSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade) // 关联快照
+
+  @@index([snapshotId]) // 快照ID索引
+  @@map("daily_plan_details") // 数据库表名
+}
