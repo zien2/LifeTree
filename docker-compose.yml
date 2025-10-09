@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: lifetree-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: lifetree_root_password
+      MYSQL_DATABASE: life_db
+      MYSQL_USER: lifetree_user
+      MYSQL_PASSWORD: lifetree_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./prisma/add-comments.sql:/docker-entrypoint-initdb.d/add-comments.sql
+    networks:
+      - lifetree-network
+
+  # LifeTree 应用
+  app:
+    build: .
+    container_name: lifetree-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://lifetree_user:lifetree_password@mysql:3306/life_db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+    depends_on:
+      - mysql
+    networks:
+      - lifetree-network
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:
+
+networks:
+  lifetree-network:
+    driver: bridge
