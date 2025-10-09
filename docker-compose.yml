@@ -9,8 +9,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: lifetree_root_password
       MYSQL_DATABASE: life_db
-      MYSQL_USER: lifetree_user
-      MYSQL_PASSWORD: lifetree_password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     volumes:
