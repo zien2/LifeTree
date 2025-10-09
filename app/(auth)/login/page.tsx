@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { Form, Input, Button, Card, Typography, message, Space, Checkbox, Alert } from 'antd'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -9,7 +9,7 @@ import axios from 'axios'
 
 const { Title, Text } = Typography
 
-export default function LoginPage() {
+function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [resendingEmail, setResendingEmail] = useState(false)
   const [showResendButton, setShowResendButton] = useState(false)
@@ -285,6 +285,14 @@ export default function LoginPage() {
         </div>
       </Card>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
 

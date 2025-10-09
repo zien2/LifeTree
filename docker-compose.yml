@@ -29,8 +29,14 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=mysql://lifetree_user:lifetree_password@mysql:3306/life_db
-      - JWT_SECRET=your-super-secret-jwt-key
+      - JWT_SECRET=docker-jwt-secret-key
       - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+      - AI_API_KEY=your_bailian_api_key
+      - SMTP_HOST=smtp.qq.com
+      - SMTP_PORT=465
+      - SMTP_SECURE=true
+      - SMTP_USER=your_email@qq.com
+      - SMTP_PASS=your_smtp_password
     depends_on:
       - mysql
     networks:

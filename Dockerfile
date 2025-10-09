@@ -3,9 +3,14 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
+# Install OpenSSL and other dependencies for Prisma
+RUN apk add --no-cache openssl openssl-dev
+
 # 1) Install deps in a clean layer
 FROM base AS deps
 COPY package*.json ./
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
 
 # 2) Build the app
@@ -22,6 +27,9 @@ FROM base AS prod
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
+
+# Install OpenSSL for Prisma in production
+RUN apk add --no-cache openssl
 
 # Copy required artifacts
 COPY --from=build /app/.next ./.next

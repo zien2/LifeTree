@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { Card, Typography, Button, Space, Result } from 'antd'
 import { MailOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -8,7 +8,7 @@ import axios from 'axios'
 
 const { Title, Text, Paragraph } = Typography
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [resending, setResending] = useState(false)
   const [email, setEmail] = useState('')
   const router = useRouter()
@@ -121,6 +121,14 @@ export default function VerifyEmailPage() {
         </div>
       </Card>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }
 
