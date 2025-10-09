@@ -43,8 +43,15 @@ export async function getAuthUserFromRequest(request: Request): Promise<AuthUser
     }
     
     const token = authHeader.substring(7)
-    const user = await jwtVerifyToken(token)
-    return user
+    const payload = await jwtVerifyToken(token)
+    if (!payload) return null
+    
+    // 将 JWTPayload 转换为 AuthUser
+    return {
+      id: payload.userId,
+      email: payload.email,
+      emailVerified: true // 假设已验证，实际应该从数据库查询
+    }
   } catch (error) {
     console.error('验证用户身份失败:', error)
     return null

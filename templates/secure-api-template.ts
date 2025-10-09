@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
     const param1 = searchParams.get('param1')
 
     // 3. 执行业务逻辑 - 确保数据按用户隔离
-    const data = await prisma.yourModel.findMany({
+    // 示例：获取用户的计划
+    const data = await prisma.plan.findMany({
       where: { 
         userId: payload.userId, // 重要：按用户隔离数据
         // 其他查询条件...
@@ -87,11 +88,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 创建数据 - 确保关联到当前用户
-    const newData = await prisma.yourModel.create({
+    const newData = await prisma.plan.create({
       data: {
         userId: payload.userId, // 重要：关联到当前用户
-        field1,
-        field2,
+        title: '示例计划',
+        description: '这是一个示例计划',
+        priority: 'MEDIUM',
+        status: 'PENDING',
         // 其他字段...
       }
     })
@@ -134,7 +137,7 @@ export async function PATCH(
     }
 
     // 2. 检查数据是否存在且属于当前用户
-    const existingData = await prisma.yourModel.findUnique({
+    const existingData = await prisma.plan.findUnique({
       where: { id: params.id }
     })
 
@@ -157,11 +160,11 @@ export async function PATCH(
     const { field1, field2 } = body
 
     // 4. 更新数据
-    const updatedData = await prisma.yourModel.update({
+    const updatedData = await prisma.plan.update({
       where: { id: params.id },
       data: {
-        field1,
-        field2,
+        title: '更新的计划',
+        description: '这是更新后的计划描述',
         // 其他字段...
       }
     })
@@ -204,7 +207,7 @@ export async function DELETE(
     }
 
     // 2. 检查数据是否存在且属于当前用户
-    const existingData = await prisma.yourModel.findUnique({
+    const existingData = await prisma.plan.findUnique({
       where: { id: params.id }
     })
 
@@ -223,7 +226,7 @@ export async function DELETE(
     }
 
     // 3. 删除数据
-    await prisma.yourModel.delete({
+    await prisma.plan.delete({
       where: { id: params.id }
     })
 

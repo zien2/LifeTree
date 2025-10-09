@@ -3,17 +3,11 @@
 import axios from 'axios'
 import dayjs from 'dayjs'
 
-// 计划接口
-export interface Plan {
-  id: string
-  title: string
-  status: string
-  description?: string
-  priority?: string
-  dueDate?: string
-  completedAt?: string
-  createdAt: string
-}
+// 导入统一的 Plan 类型
+import { Plan } from '@/types/plan'
+
+// 重新导出 Plan 类型
+export type { Plan }
 
 // 检查计划是否完成
 export const isPlanCompleted = (plan: Plan) => plan.status === 'COMPLETED'

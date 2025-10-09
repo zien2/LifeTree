@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     // 从URL参数获取邮箱
-    const emailParam = searchParams.get('email')
+    const emailParam = searchParams?.get('email')
     if (emailParam) {
       setEmail(emailParam)
     } else {

@@ -60,3 +60,16 @@ export function serverErrorResponse(message = '服务器内部错误') {
   return errorResponse(message, 'SERVER_ERROR', 500)
 }
 
+/**
+ * API 响应类
+ */
+export class ApiResponse {
+  static success<T>(data: T, message?: string, status = 200) {
+    return successResponse(data, message, status)
+  }
+
+  static error(message: string, status = 400, code = 'ERROR') {
+    return errorResponse(message, code, status)
+  }
+}
+
