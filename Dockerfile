@@ -3,8 +3,9 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-# Install OpenSSL and other dependencies for Prisma
-RUN apk add --no-cache openssl openssl-dev
+# 换国内源并安装 OpenSSL 和 Prisma 依赖
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache openssl openssl-dev
 
 # 1) Install deps in a clean layer
 FROM base AS deps
@@ -28,8 +29,9 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
-# Install OpenSSL for Prisma in production
-RUN apk add --no-cache openssl
+# 换国内源并安装 OpenSSL for Prisma in production
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache openssl
 
 # Copy required artifacts
 COPY --from=build /app/.next ./.next
