@@ -7,12 +7,12 @@ services:
     container_name: lifetree-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: lifetree_root_password
-      MYSQL_DATABASE: life_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-life_db}
+      MYSQL_USER: ${MYSQL_USER:-lifetree_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD must be set}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./prisma/add-comments.sql:/docker-entrypoint-initdb.d/add-comments.sql
@@ -28,15 +28,16 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=mysql://lifetree_user:lifetree_password@mysql:3306/life_db
-      - JWT_SECRET=docker-jwt-secret-key
+      - DATABASE_URL=mysql://${MYSQL_USER:-lifetree_user}:${MYSQL_PASSWORD:?MYSQL_PASSWORD must be set}@mysql:3306/${MYSQL_DATABASE:-life_db}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
+      - CRON_SECRET_TOKEN=${CRON_SECRET_TOKEN:?CRON_SECRET_TOKEN must be set}
       - NEXT_PUBLIC_BASE_URL=http://localhost:3000
-      - AI_API_KEY=your_bailian_api_key
+      - AI_API_KEY=${AI_API_KEY:-}
       - SMTP_HOST=smtp.qq.com
       - SMTP_PORT=465
       - SMTP_SECURE=true
-      - SMTP_USER=your_email@qq.com
-      - SMTP_PASS=your_smtp_password
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
     depends_on:
       - mysql
     networks:

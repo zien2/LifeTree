@@ -5,7 +5,10 @@ async function testAiApi() {
   try {
     console.log('🤖 测试阿里云百炼AI API...');
     
-    const aiApiKey = process.env.AI_API_KEY || 'sk-c3d3d8211d2e4a70a4132631ec644e42';
+    const aiApiKey = process.env.AI_API_KEY;
+    if (!aiApiKey || !aiApiKey.trim()) {
+      throw new Error('AI_API_KEY is required to run this test');
+    }
     const aiApiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
     
     const response = await fetch(aiApiUrl, {

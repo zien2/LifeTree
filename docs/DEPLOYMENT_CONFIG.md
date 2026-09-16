@@ -20,8 +20,8 @@ JWT_SECRET="your-production-jwt-secret-change-this"
 SMTP_HOST="smtp.qq.com"
 SMTP_PORT="587"
 SMTP_SECURE="false"
-SMTP_USER="1561588898@qq.com"
-SMTP_PASSWORD="qfwnqzlcztgvgeei"
+SMTP_USER="your_email@example.com"
+SMTP_PASSWORD="your_smtp_app_password"
 ```
 
 ---
@@ -55,8 +55,8 @@ JWT_SECRET = your-strong-random-secret
 SMTP_HOST = smtp.qq.com
 SMTP_PORT = 587
 SMTP_SECURE = false
-SMTP_USER = 1561588898@qq.com
-SMTP_PASSWORD = qfwnqzlcztgvgeei
+SMTP_USER = your_email@example.com
+SMTP_PASSWORD = your_smtp_app_password
 ```
 
 #### 步骤4：部署
@@ -103,8 +103,8 @@ JWT_SECRET="your-production-jwt-secret"
 SMTP_HOST="smtp.qq.com"
 SMTP_PORT="587"
 SMTP_SECURE="false"
-SMTP_USER="1561588898@qq.com"
-SMTP_PASSWORD="qfwnqzlcztgvgeei"
+SMTP_USER="your_email@example.com"
+SMTP_PASSWORD="your_smtp_app_password"
 ```
 
 #### 步骤4：构建项目
@@ -163,8 +163,8 @@ services:
       - SMTP_HOST=smtp.qq.com
       - SMTP_PORT=587
       - SMTP_SECURE=false
-      - SMTP_USER=1561588898@qq.com
-      - SMTP_PASSWORD=qfwnqzlcztgvgeei
+      - SMTP_USER=your_email@example.com
+      - SMTP_PASSWORD=your_smtp_app_password
     depends_on:
       - mysql
 
@@ -351,4 +351,3 @@ console.log('BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL)
 
 **最后更新**: 2024-10-07  
 **文档版本**: v1.0
-

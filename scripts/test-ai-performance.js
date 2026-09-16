@@ -28,8 +28,8 @@ const testData = {
 async function testAiPerformance() {
   console.log('🚀 开始AI分析性能测试...\n')
   
-  const token = process.env.TEST_TOKEN || 'YOUR_AUTH_TOKEN_HERE'
-  if (token === 'YOUR_AUTH_TOKEN_HERE') {
+  const token = process.env.TEST_TOKEN
+  if (!token) {
     console.warn('⚠️  请设置 TEST_TOKEN 环境变量或修改脚本中的token')
     console.warn('   例如: TEST_TOKEN=your_token node scripts/test-ai-performance.js')
     return

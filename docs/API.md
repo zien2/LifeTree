@@ -837,7 +837,7 @@ API 版本通过 URL 路径指定（未来支持）：
 
 **测试账号**:
 - 邮箱: `demo@lifetree.com`
-- 密码: `Demo123!`
+- 密码: 运行 seed 时配置的 `SEED_DEMO_PASSWORD`
 
 **Base URL**: `https://api-test.lifetree.com`
 
@@ -856,4 +856,3 @@ API 版本通过 URL 路径指定（未来支持）：
 **文档版本**: v1.0.0  
 **最后更新**: 2024年10月7日  
 **维护者**: LifeTree API Team
-

@@ -38,10 +38,7 @@ export default function PlansPage() {
   const fetchPlans = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-      const response = await axios.get('/api/plans', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get('/api/plans')
       if (response.data.success) {
         setPlans(response.data.data.plans)
       }
@@ -83,10 +80,7 @@ export default function PlansPage() {
   // 刷新日期详情弹窗的数据
   const refreshDateDetailModal = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get('/api/plans', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get('/api/plans')
       if (response.data.success) {
         const updatedPlans = response.data.data.plans
         setPlans(updatedPlans)
@@ -264,7 +258,6 @@ export default function PlansPage() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields()
-      const token = localStorage.getItem('token')
       
       // 处理开始日期
       let startDate: string | undefined = undefined
@@ -297,15 +290,11 @@ export default function PlansPage() {
       console.log('➡️ 提交计划数据:', planData)
       if (editingPlan) {
         // 更新计划
-        await axios.patch(`/api/plans/${editingPlan.id}`, planData, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        await axios.patch(`/api/plans/${editingPlan.id}`, planData)
         message.success('计划已更新')
       } else {
         // 创建计划
-        await axios.post('/api/plans', planData, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        await axios.post('/api/plans', planData)
         message.success('计划已创建')
       }
       
@@ -322,10 +311,7 @@ export default function PlansPage() {
   // 删除计划
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.delete(`/api/plans/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await axios.delete(`/api/plans/${id}`)
       message.success('计划已删除')
       fetchPlans()
       setDetailModalVisible(false)
@@ -338,12 +324,10 @@ export default function PlansPage() {
   // 切换计划状态
   const togglePlanStatus = async (plan: Plan) => {
     try {
-      const token = localStorage.getItem('token')
       const newCompleted = plan.status !== 'COMPLETED'
       await axios.patch(
         `/api/plans/${plan.id}`,
-        { completed: newCompleted },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { completed: newCompleted }
       )
       
       message.success(newCompleted ? '计划已完成' : '计划已重新激活')

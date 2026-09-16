@@ -14,6 +14,7 @@
 
 # production
 /build
+/data/tree-snapshots/
 
 # misc
 .DS_Store
@@ -38,4 +39,3 @@ next-env.d.ts
 # prisma
 prisma/dev.db
 prisma/dev.db-journal
-

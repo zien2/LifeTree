@@ -28,30 +28,31 @@ cd LifeTree
 复制环境变量模板：
 
 ```bash
-cp env.sample .env
+cp .env.example .env
 ```
 
 编辑 `.env` 文件，配置以下变量：
 
 ```env
 # 数据库连接（Docker Compose 会自动配置）
-DATABASE_URL=mysql://lifetree_user:lifetree_password@mysql:3306/life_db
+DATABASE_URL=mysql://lifetree_user:${MYSQL_PASSWORD}@mysql:3306/life_db
 
 # JWT 密钥
-JWT_SECRET=your-super-secret-jwt-key
+JWT_SECRET=generate-a-random-secret
+CRON_SECRET_TOKEN=generate-another-random-secret
 
 # 应用基础 URL
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # AI API 配置（可选）
-AI_API_KEY=your_bailian_api_key
+AI_API_KEY=
 
 # 邮件配置（可选）
 SMTP_HOST=smtp.qq.com
 SMTP_PORT=465
 SMTP_SECURE=true
 SMTP_USER=your_email@qq.com
-SMTP_PASS=your_smtp_password
+SMTP_PASSWORD=
 ```
 
 ### 3. 启动服务
@@ -77,7 +78,7 @@ sleep 30
 docker-compose exec app npx prisma db push
 
 # 添加数据库注释（可选）
-docker-compose exec mysql mysql -u lifetree_user -plifetree_password life_db < /docker-entrypoint-initdb.d/add-comments.sql
+docker-compose exec mysql mysql -u lifetree_user -p"$MYSQL_PASSWORD" life_db < /docker-entrypoint-initdb.d/add-comments.sql
 ```
 
 ### 5. 访问应用
@@ -113,13 +114,13 @@ docker-compose logs -f mysql
 docker-compose exec app sh
 
 # 进入数据库容器
-docker-compose exec mysql mysql -u lifetree_user -plifetree_password life_db
+docker-compose exec mysql mysql -u lifetree_user -p"$MYSQL_PASSWORD" life_db
 
 # 备份数据库
-docker-compose exec mysql mysqldump -u lifetree_user -plifetree_password life_db > backup.sql
+docker-compose exec mysql mysqldump -u lifetree_user -p"$MYSQL_PASSWORD" life_db > backup.sql
 
 # 恢复数据库
-docker-compose exec -T mysql mysql -u lifetree_user -plifetree_password life_db < backup.sql
+docker-compose exec -T mysql mysql -u lifetree_user -p"$MYSQL_PASSWORD" life_db < backup.sql
 ```
 
 ### 应用管理
@@ -324,10 +325,10 @@ docker-compose exec app npx prisma db push
 
 ```bash
 # 备份数据库
-docker-compose exec mysql mysqldump -u lifetree_user -plifetree_password life_db > backup_$(date +%Y%m%d_%H%M%S).sql
+docker-compose exec mysql mysqldump -u lifetree_user -p"$MYSQL_PASSWORD" life_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # 恢复数据库
-docker-compose exec -T mysql mysql -u lifetree_user -plifetree_password life_db < backup_20241009_120000.sql
+docker-compose exec -T mysql mysql -u lifetree_user -p"$MYSQL_PASSWORD" life_db < backup_20241009_120000.sql
 ```
 
 ## 📞 技术支持

@@ -37,8 +37,8 @@ jobs:
           NEXT_TELEMETRY_DISABLED: '1'
           # 以下环境变量为构建占位，生产请在仓库Secrets中配置真实值
           JWT_SECRET: dummy_secret
+          CRON_SECRET_TOKEN: dummy_cron_secret
           AI_API_KEY: dummy_key
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
         run: npm run build
-
 

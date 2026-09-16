@@ -73,17 +73,25 @@ export async function POST(request: NextRequest) {
     // 8. 返回用户信息（不包含密码）
     const { password: _, ...userWithoutPassword } = user
 
-    return successResponse(
+    const response = successResponse(
       {
         user: userWithoutPassword,
-        token,
         expiresIn: 604800, // 7天（秒）
       },
       '登录成功'
     )
+
+    response.cookies.set('lifetree_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 604800,
+      path: '/',
+    })
+
+    return response
   } catch (error) {
     console.error('登录错误:', error)
     return serverErrorResponse('登录失败，请稍后重试')
   }
 }
-

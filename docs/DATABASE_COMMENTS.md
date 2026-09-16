@@ -20,7 +20,7 @@
 ### 方法1: 查看表注释
 
 ```bash
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "
 SELECT TABLE_NAME, TABLE_COMMENT 
 FROM information_schema.TABLES 
 WHERE TABLE_SCHEMA='life-db' 
@@ -32,22 +32,22 @@ ORDER BY TABLE_NAME;
 
 ```bash
 # 查看 users 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM users;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM users;"
 
 # 查看 plans 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM plans;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM plans;"
 
 # 查看 leaves 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM leaves;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM leaves;"
 
 # 查看 trees 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM trees;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM trees;"
 
 # 查看 ai_analyses 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM ai_analyses;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM ai_analyses;"
 
 # 查看 notifications 表
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM notifications;"
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 -e "SHOW FULL COLUMNS FROM notifications;"
 ```
 
 ### 方法3: 使用数据库工具查看
@@ -78,15 +78,15 @@ docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-s
 如果需要重新添加注释，执行：
 
 ```bash
-cd /Users/hanzhiyin/lifetree
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 < prisma/add-comments.sql
+cd /path/to/LifeTree
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 < prisma/add-comments.sql
 ```
 
 ## 📁 相关文件
 
-- **注释SQL脚本**: `/Users/hanzhiyin/lifetree/prisma/add-comments.sql`
-- **数据库设计文档**: `/Users/hanzhiyin/lifetree/docs/DATABASE.md`
-- **Prisma Schema**: `/Users/hanzhiyin/lifetree/prisma/schema.prisma`
+- **注释SQL脚本**: `prisma/add-comments.sql`
+- **数据库设计文档**: `docs/DATABASE.md`
+- **Prisma Schema**: `prisma/schema.prisma`
 
 ## 📋 字段注释示例
 
@@ -161,4 +161,3 @@ docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-s
 
 **创建时间**: 2024年10月7日  
 **维护者**: LifeTree 开发团队
-

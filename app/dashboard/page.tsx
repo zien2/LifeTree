@@ -83,10 +83,7 @@ export default function DashboardPage() {
 
   const fetchUserInfo = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get('/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get('/api/auth/me')
       if (response.data.success) {
         setUser(response.data.data.user)
       }
@@ -156,10 +153,7 @@ export default function DashboardPage() {
 
   const deletePlan = async (planId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.delete(`/api/plans/${planId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await axios.delete(`/api/plans/${planId}`)
       fetchPlans()
       fetchUserInfo() // 更新统计数据
     } catch (error) {

@@ -1,11 +1,13 @@
 #!/bin/bash
+: "${TEST_RECIPIENT_EMAIL:?Set TEST_RECIPIENT_EMAIL to the inbox used for this test}"
+: "${TEST_USER_PASSWORD:?Set TEST_USER_PASSWORD to a non-production test password}"
+
 echo "🧪 测试邮件发送..."
 echo ""
-echo "📧 验证邮件将发送到：1561588898@qq.com"
+echo "📧 验证邮件将发送到：$TEST_RECIPIENT_EMAIL"
 echo ""
 
-# 生成唯一邮箱
-TEST_EMAIL="test$(date +%s)@example.com"
+TEST_EMAIL="$TEST_RECIPIENT_EMAIL"
 
 echo "正在注册测试账号：$TEST_EMAIL"
 echo ""
@@ -14,7 +16,7 @@ RESPONSE=$(curl -s -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d "{
     \"email\": \"$TEST_EMAIL\",
-    \"password\": \"Test123456\",
+    \"password\": \"$TEST_USER_PASSWORD\",
     \"name\": \"邮件测试用户\"
   }")
 
@@ -25,11 +27,11 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 if echo "$RESPONSE" | grep -q '"emailVerificationSent": true'; then
     echo "✅ 成功！邮件已发送"
-    echo "📬 请检查您的QQ邮箱：1561588898@qq.com"
+    echo "📬 请检查测试邮箱：$TEST_RECIPIENT_EMAIL"
     echo "📧 查看收件箱或垃圾邮件箱"
     echo ""
     echo "邮件主题：验证您的 LifeTree 邮箱"
-    echo "发件人：LifeTree <1561588898@qq.com>"
+    echo "发件人：LifeTree <部署配置的 SMTP_USER>"
 elif echo "$RESPONSE" | grep -q '"success": false'; then
     echo "❌ 发送失败"
     echo ""

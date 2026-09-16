@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getRequiredEnv } from '@/lib/security-config'
 
 // POST /api/cron/daily-snapshot - 每日凌晨自动创建数据快照
 export async function POST(request: NextRequest) {
   try {
     // 验证请求来源（可选：添加API密钥验证）
     const authHeader = request.headers.get('authorization')
-    const expectedToken = process.env.CRON_SECRET_TOKEN || 'lifetree-cron-2024'
+    const expectedToken = getRequiredEnv('CRON_SECRET_TOKEN')
     
     if (authHeader !== `Bearer ${expectedToken}`) {
       return NextResponse.json(
@@ -148,7 +149,7 @@ export async function GET(request: NextRequest) {
       const testRequest = new NextRequest(request.url, {
         method: 'POST',
         headers: {
-          'authorization': `Bearer ${process.env.CRON_SECRET_TOKEN || 'lifetree-cron-2024'}`,
+          'authorization': `Bearer ${getRequiredEnv('CRON_SECRET_TOKEN')}`,
           'content-type': 'application/json'
         },
         body: JSON.stringify({ date: testDate })

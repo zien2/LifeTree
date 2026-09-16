@@ -20,7 +20,7 @@ npm run dev
 # 2. 注册新用户
 访问: http://localhost:3000/register
 邮箱: test@example.com（任意邮箱）
-密码: Test123456
+密码: 使用仅限本地测试的唯一密码
 ```
 
 **在控制台中查看**:
@@ -146,7 +146,7 @@ curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
-    "password": "Test123456",
+    "password": "replace-with-a-unique-test-password",
     "name": "测试用户"
   }'
 
@@ -288,4 +288,3 @@ node test-smtp.js
 
 **更新时间**: 2024-10-07  
 **需要帮助?** 查看 `docs/EMAIL_VERIFICATION.md` 了解更多详情
-

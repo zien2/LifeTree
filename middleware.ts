@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken } from '@/lib/jwt'
+import { extractTokenFromHeaders } from '@/lib/security-config'
+import { matchesConfiguredPath } from '@/lib/path-security'
 
 // 需要身份验证的路径
 const protectedPaths = [
@@ -11,6 +12,9 @@ const protectedPaths = [
   '/api/cron',
   '/api/test-plans',
   '/api/hello',
+  '/api/tree-snapshots',
+  '/api/dashboard-tree-snapshot',
+  '/api/ai-analysis',
   // 未来功能路径（预配置）
   '/api/analytics',
   '/api/user',
@@ -31,16 +35,23 @@ const publicPaths = [
   '/api/auth/register',
   '/api/auth/verify-email',
   '/api/auth/resend-verification',
+  '/api/auth/logout',
   '/api/auth/me'
 ]
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // 旧版把快照放在 public/；永久禁用其直链，统一改走带用户校验的 API。
+  if (matchesConfiguredPath(pathname, '/tree-snapshots')) {
+    return NextResponse.json(
+      { success: false, message: 'Legacy snapshot URL is disabled' },
+      { status: 410 }
+    )
+  }
+
   // 检查是否是公开路径
-  const isPublicPath = publicPaths.some(path => 
-    pathname === path || pathname.startsWith(path)
-  )
+  const isPublicPath = publicPaths.some(path => matchesConfiguredPath(pathname, path))
 
   // 如果是公开路径，直接放行
   if (isPublicPath) {
@@ -48,15 +59,13 @@ export function middleware(request: NextRequest) {
   }
 
   // 检查是否是受保护的路径
-  const isProtectedPath = protectedPaths.some(path => 
-    pathname.startsWith(path)
-  )
+  const isProtectedPath = protectedPaths.some(path => matchesConfiguredPath(pathname, path))
 
   // 如果是受保护的路径
   if (isProtectedPath) {
-    // 对于API路径，只检查Authorization头，不重定向
+    // Edge 中间件只做会话存在性检查；每个 API 路由在 Node 运行时验证 JWT。
     if (pathname.startsWith('/api/')) {
-      const token = request.headers.get('authorization')?.split(' ')[1]
+      const token = extractTokenFromHeaders(request.headers)
       
       if (!token) {
         // API请求没有token，返回401错误
@@ -66,26 +75,7 @@ export function middleware(request: NextRequest) {
         )
       }
 
-      try {
-        // 验证token
-        const payload = verifyToken(token)
-        if (!payload) {
-          // token无效，返回401错误
-          return NextResponse.json(
-            { success: false, message: '无效的认证令牌' },
-            { status: 401 }
-          )
-        }
-
-        // token有效，继续请求
-        return NextResponse.next()
-      } catch (error) {
-        // token验证失败，返回401错误
-        return NextResponse.json(
-          { success: false, message: '认证失败' },
-          { status: 401 }
-        )
-      }
+      return NextResponse.next()
     }
 
     // 对于页面路径，暂时不检查token，让前端处理

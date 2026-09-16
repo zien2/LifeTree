@@ -18,7 +18,7 @@ import {
 import { useRouter } from 'next/navigation'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
-import { getAuthUser, logout as authLogout, type AuthUser } from '@/lib/auth'
+import { logout as authLogout, type AuthUser } from '@/lib/auth'
 
 const { Header, Content } = Layout
 const { Text } = Typography
@@ -48,31 +48,33 @@ export default function DashboardLayout({
   }, [router])
 
   useEffect(() => {
-    // 检查用户是否已登录
-    const authUser = getAuthUser()
-    
-    if (!authUser) {
-      // 用户未登录，重定向到登录页
-      redirectToLogin()
-      return
+    let active = true
+
+    const loadSession = async () => {
+      try {
+        const response = await axios.get('/api/auth/me')
+        if (!response.data.success || !active) return
+
+        setUser(response.data.data.user)
+        fetchNotifications()
+      } catch (error) {
+        if (active) redirectToLogin()
+      }
     }
-    
-    setUser(authUser)
-    
-    // 获取通知
-    fetchNotifications()
-    
+
+    loadSession()
+
     // 每30秒刷新一次通知
     const interval = setInterval(fetchNotifications, 30000)
-    return () => clearInterval(interval)
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
   }, [redirectToLogin])
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get('/api/notifications', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get('/api/notifications')
       if (response.data.success) {
         // 只显示系统类通知，过滤掉计划类通知
         const systemNotifications = response.data.data.notifications.filter(
@@ -91,12 +93,7 @@ export default function DashboardLayout({
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.patch(
-        `/api/notifications/${notificationId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
+      await axios.patch(`/api/notifications/${notificationId}`, {})
       fetchNotifications()
     } catch (error) {
       console.error('标记已读失败:', error)
@@ -105,12 +102,7 @@ export default function DashboardLayout({
 
   const markAllAsRead = async () => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.post(
-        '/api/notifications/mark-all-read',
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
+      await axios.post('/api/notifications/mark-all-read', {})
       fetchNotifications()
     } catch (error) {
       console.error('全部标记已读失败:', error)
@@ -119,10 +111,7 @@ export default function DashboardLayout({
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.delete(`/api/notifications/${notificationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await axios.delete(`/api/notifications/${notificationId}`)
       fetchNotifications()
     } catch (error) {
       console.error('删除通知失败:', error)
@@ -448,4 +437,3 @@ export default function DashboardLayout({
     </Layout>
   )
 }
-

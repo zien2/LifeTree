@@ -1,11 +1,14 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verifyToken, extractTokenFromHeader } from '@/lib/jwt'
+import { verifyToken } from '@/lib/jwt'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 import {
   successResponse,
   unauthorizedResponse,
   serverErrorResponse,
 } from '@/lib/response'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * 获取当前用户信息 API
@@ -13,9 +16,8 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    // 1. 从请求头中提取 Token
-    const authHeader = request.headers.get('authorization')
-    const token = extractTokenFromHeader(authHeader)
+    // 1. 从 Authorization 头或 HttpOnly Cookie 中提取 Token
+    const token = extractTokenFromHeaders(request.headers)
 
     if (!token) {
       return unauthorizedResponse('未提供认证信息')
@@ -71,4 +73,3 @@ export async function GET(request: NextRequest) {
     return serverErrorResponse('获取用户信息失败')
   }
 }
-

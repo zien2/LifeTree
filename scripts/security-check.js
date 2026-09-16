@@ -23,7 +23,8 @@ const PROTECTED_PATHS = [
   '/api/daily-snapshots',
   '/api/cron',
   '/api/test-plans',
-  '/api/hello'
+  '/api/hello',
+  '/api/ai-analysis'
 ]
 
 // 公开路径列表
@@ -41,6 +42,9 @@ const PUBLIC_PATHS = [
 function checkAPISecurity(filePath) {
   const content = fs.readFileSync(filePath, 'utf8')
   const issues = []
+  const usesSharedAuth =
+    content.includes('getAuthUserFromRequest') ||
+    content.includes('extractTokenFromHeaders')
 
   // 跳过认证相关的API（这些不需要验证token）
   if (filePath.includes('/api/auth/')) {
@@ -53,17 +57,21 @@ function checkAPISecurity(filePath) {
   }
 
   // 检查是否导入了verifyToken
-  if (!content.includes('verifyToken')) {
+  if (!content.includes('verifyToken') && !usesSharedAuth) {
     issues.push('❌ 缺少JWT token验证')
   }
 
   // 检查是否验证了token
-  if (!content.includes('verifyToken(token)')) {
+  if (!content.includes('verifyToken(token)') && !usesSharedAuth) {
     issues.push('❌ 没有验证JWT token')
   }
 
   // 检查是否检查了用户ID
-  if (!content.includes('userId') && !content.includes('payload.userId')) {
+  if (
+    !content.includes('userId') &&
+    !content.includes('payload.userId') &&
+    !usesSharedAuth
+  ) {
     issues.push('⚠️  可能缺少用户数据隔离')
   }
 

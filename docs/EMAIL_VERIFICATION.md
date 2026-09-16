@@ -322,7 +322,7 @@ curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
-    "password": "Test123456",
+    "password": "replace-with-a-unique-test-password",
     "name": "测试用户"
   }'
 ```
@@ -415,4 +415,3 @@ curl -X POST http://localhost:3000/api/auth/resend-verification \
 **创建时间**: 2024-10-07  
 **最后更新**: 2024-10-07  
 **维护者**: LifeTree 开发团队
-

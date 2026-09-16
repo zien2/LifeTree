@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
+import { getRequiredEnv } from './security-config'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key'
 const JWT_EXPIRES_IN = '7d' // Token 有效期7天
 
 export interface JWTPayload {
@@ -12,7 +12,7 @@ export interface JWTPayload {
  * 生成 JWT Token
  */
 export function signToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getRequiredEnv('JWT_SECRET'), {
     expiresIn: JWT_EXPIRES_IN,
   })
 }
@@ -22,7 +22,7 @@ export function signToken(payload: JWTPayload): string {
  */
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload
+    const decoded = jwt.verify(token, getRequiredEnv('JWT_SECRET')) as JWTPayload
     return decoded
   } catch (error) {
     return null
@@ -38,4 +38,3 @@ export function extractTokenFromHeader(authHeader: string | null): string | null
   }
   return authHeader.substring(7)
 }
-

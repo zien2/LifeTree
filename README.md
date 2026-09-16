@@ -196,7 +196,7 @@ LifeTree（生命树）是一款创新的计划管理工具，旨在通过视觉
 ┌─────────────────────▼───────────────────────────────────┐
 │                   外部服务层                             │
 │           ┌──────────────────────────┐                  │
-│           │   OpenAI API (GPT-3.5)   │                  │
+│           │ DashScope / Moonshot API │                  │
 │           │   AI 分析与建议生成       │                  │
 │           └──────────────────────────┘                  │
 └─────────────────────────────────────────────────────────┘
@@ -332,8 +332,11 @@ DATABASE_URL="mysql://root:your_password@localhost:3306/life-db"
 # JWT 密钥（生产环境请使用强密钥）
 JWT_SECRET="your-super-secret-jwt-key"
 
-# OpenAI API Key（可选，用于AI分析功能）
-OPENAI_API_KEY="sk-your-openai-api-key"
+# DashScope API Key（使用 AI 分析时必填；不要提交真实值）
+AI_API_KEY=""
+
+# 定时快照任务密钥
+CRON_SECRET_TOKEN=""
 ```
 
 ### 4. 启动 MySQL 数据库
@@ -901,7 +904,8 @@ Response 200:
    - 配置环境变量：
      - `DATABASE_URL`
      - `JWT_SECRET`
-     - `OPENAI_API_KEY`
+     - `AI_API_KEY`
+     - `CRON_SECRET_TOKEN`
    - 点击 Deploy
 
 4. **初始化数据库**
@@ -933,7 +937,8 @@ DATABASE_URL=          # 数据库连接字符串
 JWT_SECRET=            # JWT 密钥
 
 # 可选
-OPENAI_API_KEY=        # OpenAI API Key（AI功能需要）
+AI_API_KEY=            # DashScope API Key（AI功能需要）
+CRON_SECRET_TOKEN=     # 定时快照任务密钥
 NODE_ENV=production    # 生产环境
 PORT=3000              # 端口号
 ```
@@ -955,8 +960,8 @@ PORT=3000              # 端口号
 ### Q: AI 分析功能不工作？
 
 **A:** 
-1. 检查 `OPENAI_API_KEY` 是否配置
-2. 确认 OpenAI API 账户有额度
+1. 检查 `AI_API_KEY` 是否配置
+2. 确认 DashScope 账户有额度
 3. 查看 API 日志了解具体错误
 
 ### Q: 生命树动画卡顿？
@@ -996,7 +1001,7 @@ UPDATE users SET password = '$2a$10$...' WHERE email = 'user@example.com';
 - 🔐 用户注册/登录系统
 - 📋 计划 CRUD 功能
 - 🌲 生命树可视化动画
-- 🤖 AI 成长分析（集成 GPT-3.5）
+- 🤖 AI 成长分析（集成 DashScope OpenAI-compatible API）
 - 🔔 系统通知功能
 - 📊 数据统计和趋势分析
 
@@ -1063,7 +1068,7 @@ in the Software without restriction...
 
 ## 👥 团队
 
-- **项目负责人**: [@hanzhiyin](https://github.com/hanzhiyin)
+- **项目负责人**: [@zien2](https://github.com/zien2)
 - **技术顾问**: AI Assistant
 
 ---
@@ -1076,14 +1081,14 @@ in the Software without restriction...
 - [Ant Design](https://ant.design/) - UI 组件库
 - [Framer Motion](https://www.framer.com/motion/) - 动画库
 - [Prisma](https://www.prisma.io/) - 数据库 ORM
-- [OpenAI](https://openai.com/) - AI 能力支持
+- [Alibaba Cloud Model Studio](https://www.alibabacloud.com/help/en/model-studio/) - AI 能力支持
 
 ---
 
 ## 📞 联系我们
 
-- **项目主页**: [https://github.com/hanzhiyin/lifetree](https://github.com/hanzhiyin/lifetree)
-- **问题反馈**: [GitHub Issues](https://github.com/hanzhiyin/lifetree/issues)
+- **项目主页**: [https://github.com/zien2/LifeTree](https://github.com/zien2/LifeTree)
+- **问题反馈**: [GitHub Issues](https://github.com/zien2/LifeTree/issues)
 - **邮箱**: support@lifetree.com
 
 ---

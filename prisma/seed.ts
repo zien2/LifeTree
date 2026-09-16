@@ -1,58 +1,75 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { getRequiredEnv } from '../lib/security-config'
 
 const prisma = new PrismaClient()
+
+function getSeedPassword(name: string): string {
+  const password = getRequiredEnv(name)
+  if (password.length < 12) {
+    throw new Error(`${name} must contain at least 12 characters`)
+  }
+  return password
+}
+
+if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+  throw new Error('Set ALLOW_DESTRUCTIVE_SEED=true to confirm destructive database seeding')
+}
+
+const userPassword = getSeedPassword('SEED_USER_PASSWORD')
+const adminPassword = getSeedPassword('SEED_ADMIN_PASSWORD')
+const demoPassword = getSeedPassword('SEED_DEMO_PASSWORD')
 
 // 测试用户数据
 const testUsers = [
   {
     email: 'zhangsan@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '张三',
   },
   {
     email: 'lisi@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '李四',
   },
   {
     email: 'wangwu@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '王五',
   },
   {
     email: 'zhaoliu@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '赵六',
   },
   {
     email: 'sunqi@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '孙七',
   },
   {
     email: 'zhouba@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '周八',
   },
   {
     email: 'wujiu@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '吴九',
   },
   {
     email: 'zhengshi@lifetree.com',
-    password: 'Test123456',
+    password: userPassword,
     name: '郑十',
   },
   {
     email: 'admin@lifetree.com',
-    password: 'Admin123456',
+    password: adminPassword,
     name: '管理员',
   },
   {
     email: 'demo@lifetree.com',
-    password: 'Demo123456',
+    password: demoPassword,
     name: '演示账号',
   },
 ]
@@ -230,9 +247,7 @@ async function main() {
   console.log(`  - AI分析: ${analysisCount}`)
   console.log(`  - 通知数: ${notificationCount}`)
 
-  console.log('\n🔑 测试账号信息：')
-  console.log('  邮箱: zhangsan@lifetree.com ~ demo@lifetree.com')
-  console.log('  密码: Test123456 (前8个) / Admin123456 (admin) / Demo123456 (demo)')
+  console.log('\n🔑 测试账号密码由 SEED_*_PASSWORD 环境变量提供，未输出到日志。')
 }
 
 main()
@@ -243,4 +258,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
-

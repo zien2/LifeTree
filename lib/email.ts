@@ -32,21 +32,24 @@ function getEmailConfig(): EmailConfig {
 }
 
 // 创建邮件传输器
-function createTransporter() {
+async function createTransporter() {
   const config = getEmailConfig()
   
-  // 如果未配置SMTP，返回测试账号（用于开发）
+  // 生产环境缺少 SMTP 凭据时直接失败，避免使用任何内置账户。
   if (!config.auth.user || !config.auth.pass) {
-    console.warn('⚠️  未配置SMTP，使用Ethereal测试账号（邮件不会真实发送）')
-    // 在实际使用中，应该使用 nodemailer.createTestAccount() 创建测试账号
-    // 这里先返回一个模拟的传输器
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('SMTP_USER and SMTP_PASSWORD are required in production')
+    }
+
+    console.warn('⚠️  未配置SMTP，正在创建临时 Ethereal 测试账号')
+    const testAccount = await nodemailer.createTestAccount()
     return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
+      host: testAccount.smtp.host,
+      port: testAccount.smtp.port,
+      secure: testAccount.smtp.secure,
       auth: {
-        user: 'test@ethereal.email',
-        pass: 'test',
+        user: testAccount.user,
+        pass: testAccount.pass,
       },
     })
   }
@@ -79,7 +82,7 @@ export async function sendVerificationEmail(
   token: string
 ): Promise<{ success: boolean; messageId?: string; previewUrl?: string }> {
   try {
-    const transporter = createTransporter()
+    const transporter = await createTransporter()
 
     // 构建验证链接
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
@@ -204,7 +207,7 @@ export async function sendPasswordResetEmail(
   token: string
 ): Promise<{ success: boolean; messageId?: string }> {
   try {
-    const transporter = createTransporter()
+    const transporter = await createTransporter()
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     const resetUrl = `${baseUrl}/reset-password?token=${token}`
@@ -275,4 +278,3 @@ export async function sendPasswordResetEmail(
     return { success: false }
   }
 }
-

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 
 // POST /api/notifications/mark-all-read - 标记所有通知为已读
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -43,4 +44,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

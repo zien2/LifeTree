@@ -67,29 +67,26 @@
   - 忘记密码链接（待开发）
 
 - ✅ **开发者友好**
-  - **快速测试按钮**：一键填充测试账号
-  - 测试账号提示卡片
+  - 测试账号仅由开发者通过 seed 环境变量创建
   - 清晰的错误提示
 
 - ✅ **安全性**
-  - Token存储到localStorage
+  - JWT 仅存储在 HttpOnly、SameSite Cookie
   - 登录成功后自动跳转
   - Token验证失败自动跳转登录页
 
 #### 快速测试
 
-点击页面底部的"使用测试账号"按钮，自动填充：
-- 邮箱：`zhangsan@lifetree.com`
-- 密码：`Test123456`
+测试账号必须通过 `prisma:seed` 显式创建，密码来自 `SEED_*_PASSWORD` 环境变量；登录页不会展示或自动填充凭据。
 
 #### 可用测试账号
 
 | 邮箱 | 密码 | 数据 |
 |------|------|------|
-| zhangsan@lifetree.com | Test123456 | 有完整数据 |
-| lisi@lifetree.com | Test123456 | 有完整数据 |
-| zhouba@lifetree.com | Test123456 | 新用户（空） |
-| demo@lifetree.com | Demo123456 | 演示账号 |
+| zhangsan@lifetree.com | `SEED_USER_PASSWORD` | 有完整数据 |
+| lisi@lifetree.com | `SEED_USER_PASSWORD` | 有完整数据 |
+| zhouba@lifetree.com | `SEED_USER_PASSWORD` | 新用户（空） |
+| demo@lifetree.com | `SEED_DEMO_PASSWORD` | 演示账号 |
 
 ---
 
@@ -111,7 +108,7 @@
   - 加载状态提示
 
 - ✅ **退出登录**
-  - 清除Token和用户信息
+  - 调用 `/api/auth/logout` 清除 HttpOnly 会话
   - 跳转回首页
 
 #### 访问控制
@@ -119,12 +116,9 @@
 ```typescript
 // 自动检查登录状态
 useEffect(() => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    router.push('/login')  // 未登录跳转
-    return
-  }
-  fetchUserInfo(token)  // 获取用户信息
+  fetch('/api/auth/me').then((response) => {
+    if (!response.ok) router.push('/login')
+  })
 }, [])
 ```
 
@@ -169,11 +163,11 @@ useEffect(() => {
    - 加密密码
    - 创建用户
    - 创建默认生命树
-   - 生成Token
+   - 建立 HttpOnly 会话 Cookie
    ↓
 6. 前端处理：
-   - 保存Token到localStorage
-   - 保存用户信息
+   - 不接触或保存 JWT
+   - 通过 `/api/auth/me` 获取当前用户
    - 显示成功消息
    ↓
 7. 自动跳转到仪表板 (/dashboard)
@@ -196,11 +190,10 @@ useEffect(() => {
 5. 后端验证：
    - 检查邮箱是否存在
    - 验证密码是否正确
-   - 生成Token
+   - 设置 HttpOnly 会话 Cookie
    ↓
 6. 前端处理：
-   - 保存Token
-   - 保存用户信息
+   - 通过 `/api/auth/me` 获取用户信息
    - 显示成功消息
    ↓
 7. 跳转到仪表板 (/dashboard)
@@ -210,26 +203,9 @@ useEffect(() => {
 
 ## 💾 数据存储
 
-### LocalStorage 结构
+### 会话存储
 
-```javascript
-// 存储的数据
-localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIs...')
-localStorage.setItem('user', JSON.stringify({
-  id: 'cmgg6m06d0000avz389stnj83',
-  email: 'zhangsan@lifetree.com',
-  name: '张三',
-  createdAt: '2025-10-07T06:31:30.661Z'
-}))
-
-// 读取数据
-const token = localStorage.getItem('token')
-const user = JSON.parse(localStorage.getItem('user') || '{}')
-
-// 清除数据（退出登录）
-localStorage.removeItem('token')
-localStorage.removeItem('user')
-```
+JWT 由服务端通过 `HttpOnly`、`SameSite=Lax` Cookie 管理。客户端不能读取该 Cookie；页面通过 `/api/auth/me` 获取用户信息，退出时调用 `/api/auth/logout`。
 
 ---
 
@@ -262,7 +238,7 @@ localStorage.removeItem('user')
    ```
    邮箱: newuser@test.com
    昵称: 新用户
-   密码: Test123456
+   密码: 使用本地配置的测试密码
    ```
 
 2. **测试邮箱已存在**
@@ -279,7 +255,7 @@ localStorage.removeItem('user')
 
 4. **测试密码确认**
    ```
-   密码: Test123456
+   密码: 使用本地配置的测试密码
    确认密码: Test123 （不一致）
    预期: 提示"两次输入的密码不一致"
    ```
@@ -289,7 +265,7 @@ localStorage.removeItem('user')
 1. **正常登录**
    ```
    邮箱: zhangsan@lifetree.com
-   密码: Test123456
+   密码: 使用本地配置的测试密码
    预期: 成功登录并跳转到仪表板
    ```
 
@@ -303,7 +279,7 @@ localStorage.removeItem('user')
 3. **不存在的邮箱**
    ```
    邮箱: notexist@test.com
-   密码: Test123456
+   密码: 使用本地配置的测试密码
    预期: 提示"邮箱或密码错误"
    ```
 
@@ -323,7 +299,7 @@ localStorage.removeItem('user')
 
 2. **未登录状态**
    ```
-   清除localStorage，访问 /dashboard
+   调用 `/api/auth/logout`，访问 /dashboard
    预期: 自动跳转到 /login
    ```
 
@@ -393,4 +369,3 @@ localStorage.removeItem('user')
 **创建时间**: 2024-10-07  
 **最后更新**: 2024-10-07  
 **维护者**: LifeTree 开发团队
-

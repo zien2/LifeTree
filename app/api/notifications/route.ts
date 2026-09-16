@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 
 // GET /api/notifications - 获取用户的所有通知
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
 // POST /api/notifications - 创建新通知（系统内部使用）
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -111,4 +112,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

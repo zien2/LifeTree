@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer')
-const fs = require('fs').promises
-const path = require('path')
 const dayjs = require('dayjs')
 
 async function takeDashboardTreeSnapshot() {
   let browser
   try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const authToken = process.env.TREE_SNAPSHOT_TOKEN
+    if (!authToken) {
+      throw new Error('TREE_SNAPSHOT_TOKEN is required')
+    }
+
     console.log('开始截取主页生命树快照...')
     
     // 启动浏览器
@@ -18,9 +22,19 @@ async function takeDashboardTreeSnapshot() {
     
     // 设置视口大小
     await page.setViewport({ width: 1920, height: 1080 })
+
+    // 使用受限用户会话访问仪表盘；令牌只从环境变量读取。
+    await page.setCookie({
+      name: 'lifetree_token',
+      value: authToken,
+      url: baseUrl,
+      httpOnly: true,
+      sameSite: 'Lax',
+      secure: baseUrl.startsWith('https://'),
+    })
     
     // 访问主页
-    await page.goto('http://localhost:3000/dashboard', {
+    await page.goto(`${baseUrl}/dashboard`, {
       waitUntil: 'networkidle0',
       timeout: 30000
     })
@@ -67,45 +81,28 @@ async function takeDashboardTreeSnapshot() {
       })
     }
     
-    // 保存截图
+    // 通过认证 API 保存到服务器的私有快照目录。
     const today = dayjs()
-    const year = today.format('YYYY')
-    const month = today.format('MM')
-    const filename = today.format('YYYYMMDD') + '.png'
-    
-    const yearDir = path.join(process.cwd(), 'public', 'tree-snapshots', year)
-    const monthDir = path.join(yearDir, month)
-    const filePath = path.join(monthDir, filename)
-    
-    await fs.mkdir(monthDir, { recursive: true })
-    await fs.writeFile(filePath, screenshot)
-    
-    console.log(`主页生命树快照已保存: ${filePath}`)
-    
-    // 同时调用API保存快照信息
     const base64Data = screenshot.toString('base64')
     const dataUrl = `data:image/png;base64,${base64Data}`
-    
-    try {
-      const response = await fetch('http://localhost:3000/api/dashboard-tree-snapshot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageData: dataUrl,
-          date: today.format('YYYY-MM-DD')
-        })
+
+    const response = await fetch(`${baseUrl}/api/dashboard-tree-snapshot`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        imageData: dataUrl,
+        date: today.format('YYYY-MM-DD')
       })
-      
-      if (response.ok) {
-        console.log('快照信息已保存到API')
-      } else {
-        console.log('API保存失败，但文件已保存')
-      }
-    } catch (apiError) {
-      console.log('API调用失败，但文件已保存:', apiError.message)
+    })
+
+    if (!response.ok) {
+      throw new Error(`Snapshot API returned HTTP ${response.status}`)
     }
+
+    console.log('主页生命树快照已通过认证 API 保存')
     
   } catch (error) {
     console.error('截取主页生命树快照失败:', error)

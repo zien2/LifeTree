@@ -46,11 +46,9 @@ export default function TreePage() {
 
       const newStatus = plan.status === 'COMPLETED' ? 'IN_PROGRESS' : 'COMPLETED'
       
-      const token = localStorage.getItem('token')
       const response = await fetch(`/api/plans/${planId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
@@ -83,12 +81,8 @@ export default function TreePage() {
   // 删除计划
   const handlePlanDelete = useCallback(async (planId: string) => {
     try {
-      const token = localStorage.getItem('token')
       const response = await fetch(`/api/plans/${planId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       })
 
       if (response.ok) {
@@ -106,13 +100,9 @@ export default function TreePage() {
   // 添加新计划
   const handleAddPlan = useCallback(async (values: any) => {
     try {
-      const token = localStorage.getItem('token')
       const response = await fetch('/api/plans', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...values,
           dueDate: values.dueDate ? values.dueDate.toISOString() : null,
@@ -138,13 +128,9 @@ export default function TreePage() {
     if (!editingPlan) return
 
     try {
-      const token = localStorage.getItem('token')
       const response = await fetch(`/api/plans/${editingPlan.id}`, {
         method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...values,
           dueDate: values.dueDate ? values.dueDate.toISOString() : null,
@@ -580,4 +566,3 @@ export default function TreePage() {
     </div>
   )
 }
-

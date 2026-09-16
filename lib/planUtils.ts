@@ -34,11 +34,8 @@ export const sortPlansByPriority = (plans: Plan[]) => {
 // 获取计划列表
 export const fetchPlans = async () => {
   try {
-    const token = localStorage.getItem('token')
     console.log('🔍 正在获取计划列表...')
-    const response = await axios.get('/api/plans', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const response = await axios.get('/api/plans')
     console.log('📋 获取到的计划数据:', response.data)
     if (response.data.success) {
       const sortedPlans = sortPlansByPriority(response.data.data.plans)
@@ -55,13 +52,11 @@ export const fetchPlans = async () => {
 // 切换计划完成状态
 export const togglePlanComplete = async (planId: string, currentStatus: string) => {
   try {
-    const token = localStorage.getItem('token')
     const newCompleted = currentStatus !== 'COMPLETED'
     console.log('🔄 切换计划状态:', planId, '从', currentStatus, '到', newCompleted ? 'COMPLETED' : 'PENDING')
     const response = await axios.patch(
       `/api/plans/${planId}`,
       { completed: newCompleted },
-      { headers: { Authorization: `Bearer ${token}` } }
     )
     return response.data
   } catch (error) {
@@ -73,14 +68,12 @@ export const togglePlanComplete = async (planId: string, currentStatus: string) 
 // 添加计划
 export const addPlan = async (title: string, priority: string = 'MEDIUM') => {
   try {
-    const token = localStorage.getItem('token')
     const response = await axios.post(
       '/api/plans',
       { 
         title,
         priority,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
+      }
     )
     console.log('计划创建成功:', response.data)
     return response.data
@@ -93,10 +86,7 @@ export const addPlan = async (title: string, priority: string = 'MEDIUM') => {
 // 删除计划
 export const deletePlan = async (planId: string) => {
   try {
-    const token = localStorage.getItem('token')
-    const response = await axios.delete(`/api/plans/${planId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const response = await axios.delete(`/api/plans/${planId}`)
     return response.data
   } catch (error) {
     console.error('删除计划失败:', error)

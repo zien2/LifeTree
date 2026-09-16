@@ -2,6 +2,7 @@
 
 import { Card, Descriptions, Typography } from 'antd'
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 const { Title } = Typography
 
@@ -9,10 +10,11 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      setUser(JSON.parse(userStr))
-    }
+    axios.get('/api/auth/me')
+      .then((response) => {
+        if (response.data.success) setUser(response.data.data.user)
+      })
+      .catch(() => setUser(null))
   }, [])
 
   return (
@@ -41,4 +43,3 @@ export default function ProfilePage() {
     </div>
   )
 }
-

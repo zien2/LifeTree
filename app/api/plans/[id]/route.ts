@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 
 // PATCH /api/plans/[id] - 更新计划
 export async function PATCH(
@@ -8,7 +9,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -25,7 +26,6 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    console.log('PATCH /api/plans/', params.id, 'raw body =>', body)
     const { title, description, priority, startDate, dueDate, status, completed } = body
 
     // 检查计划是否属于当前用户
@@ -116,7 +116,7 @@ export async function PATCH(
   } catch (error: any) {
     console.error('更新计划失败:', error)
     return NextResponse.json(
-      { success: false, message: error?.message || '更新计划失败', stack: error?.stack },
+      { success: false, message: '更新计划失败' },
       { status: 500 }
     )
   }
@@ -128,7 +128,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -179,4 +179,3 @@ export async function DELETE(
     )
   }
 }
-

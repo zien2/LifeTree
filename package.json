@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test": "node --test tests/*.test.js",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
@@ -27,7 +28,7 @@
     "@prisma/client": "^5.14.0",
     "@types/nodemailer": "^6.4.20",
     "antd": "^5.17.0",
-    "axios": "^1.7.0",
+    "axios": "^1.20.0",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.11",
     "framer-motion": "^11.2.0",

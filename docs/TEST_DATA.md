@@ -21,21 +21,21 @@
 
 | 序号 | 邮箱 | 密码 | 姓名 | 有计划 | 说明 |
 |------|------|------|------|--------|------|
-| 1 | `zhangsan@lifetree.com` | `Test123456` | 张三 | ✅ | 完整数据用户 |
-| 2 | `lisi@lifetree.com` | `Test123456` | 李四 | ✅ | 完整数据用户 |
-| 3 | `wangwu@lifetree.com` | `Test123456` | 王五 | ✅ | 完整数据用户 |
-| 4 | `zhaoliu@lifetree.com` | `Test123456` | 赵六 | ✅ | 完整数据用户 |
-| 5 | `sunqi@lifetree.com` | `Test123456` | 孙七 | ✅ | 完整数据用户 |
-| 6 | `zhouba@lifetree.com` | `Test123456` | 周八 | ❌ | 新用户（无数据） |
-| 7 | `wujiu@lifetree.com` | `Test123456` | 吴九 | ❌ | 新用户（无数据） |
-| 8 | `zhengshi@lifetree.com` | `Test123456` | 郑十 | ❌ | 新用户（无数据） |
+| 1 | `zhangsan@lifetree.com` | `SEED_USER_PASSWORD` | 张三 | ✅ | 完整数据用户 |
+| 2 | `lisi@lifetree.com` | `SEED_USER_PASSWORD` | 李四 | ✅ | 完整数据用户 |
+| 3 | `wangwu@lifetree.com` | `SEED_USER_PASSWORD` | 王五 | ✅ | 完整数据用户 |
+| 4 | `zhaoliu@lifetree.com` | `SEED_USER_PASSWORD` | 赵六 | ✅ | 完整数据用户 |
+| 5 | `sunqi@lifetree.com` | `SEED_USER_PASSWORD` | 孙七 | ✅ | 完整数据用户 |
+| 6 | `zhouba@lifetree.com` | `SEED_USER_PASSWORD` | 周八 | ❌ | 新用户（无数据） |
+| 7 | `wujiu@lifetree.com` | `SEED_USER_PASSWORD` | 吴九 | ❌ | 新用户（无数据） |
+| 8 | `zhengshi@lifetree.com` | `SEED_USER_PASSWORD` | 郑十 | ❌ | 新用户（无数据） |
 
 ### 特殊测试账号
 
 | 邮箱 | 密码 | 姓名 | 用途 |
 |------|------|------|------|
-| `admin@lifetree.com` | `Admin123456` | 管理员 | 管理员功能测试 |
-| `demo@lifetree.com` | `Demo123456` | 演示账号 | 演示和展示用 |
+| `admin@lifetree.com` | `SEED_ADMIN_PASSWORD` | 管理员 | 管理员功能测试 |
+| `demo@lifetree.com` | `SEED_DEMO_PASSWORD` | 演示账号 | 演示和展示用 |
 
 ---
 
@@ -126,16 +126,16 @@
 # 测试注册
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"newuser@test.com","password":"Test123456","name":"新用户"}'
+  -d '{"email":"newuser@test.com","password":"replace-with-a-unique-test-password","name":"新用户"}'
 ```
 
 ### 场景2: 用户登录流程
-**使用账号**: `zhangsan@lifetree.com` / `Test123456`
+**使用账号**: `zhangsan@lifetree.com` / `SEED_USER_PASSWORD`
 ```bash
 # 测试登录
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"zhangsan@lifetree.com","password":"Test123456"}'
+  -d '{"email":"zhangsan@lifetree.com","password":"<SEED_USER_PASSWORD>"}'
 ```
 
 ### 场景3: 有数据用户
@@ -157,11 +157,11 @@ curl -X POST http://localhost:3000/api/auth/login \
 - **适合测试**: 空状态页面、创建第一个计划
 
 ### 场景5: 管理员账号
-**使用账号**: `admin@lifetree.com` / `Admin123456`
+**使用账号**: `admin@lifetree.com` / `SEED_ADMIN_PASSWORD`
 - **适合测试**: 管理员功能（未来开发）
 
 ### 场景6: 演示账号
-**使用账号**: `demo@lifetree.com` / `Demo123456`
+**使用账号**: `demo@lifetree.com` / `SEED_DEMO_PASSWORD`
 - **适合测试**: 演示和展示用途
 
 ---
@@ -171,6 +171,10 @@ curl -X POST http://localhost:3000/api/auth/login \
 如果需要重新生成测试数据，运行以下命令：
 
 ```bash
+ALLOW_DESTRUCTIVE_SEED=true \
+SEED_USER_PASSWORD='<strong-random-password>' \
+SEED_ADMIN_PASSWORD='<different-strong-random-password>' \
+SEED_DEMO_PASSWORD='<another-strong-random-password>' \
 npm run prisma:seed
 ```
 
@@ -182,25 +186,25 @@ npm run prisma:seed
 
 ### 查看用户列表
 ```bash
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 \
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 \
   -e "SELECT id, email, name FROM users;"
 ```
 
 ### 查看计划列表
 ```bash
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 \
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 \
   -e "SELECT id, title, priority, status, userId FROM plans;"
 ```
 
 ### 查看生命树
 ```bash
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 \
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 \
   -e "SELECT id, name, health, level, userId FROM trees;"
 ```
 
 ### 查看叶子
 ```bash
-docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-set=utf8mb4 \
+docker exec -i mysql-grip mysql -u root -p"$MYSQL_ROOT_PASSWORD" life-db --default-character-set=utf8mb4 \
   -e "SELECT id, color, status, treeId, planId FROM leaves LIMIT 10;"
 ```
 
@@ -229,4 +233,3 @@ docker exec -i mysql-grip mysql -u root -pHzy0520. life-db --default-character-s
 **创建时间**: 2024-10-07  
 **更新时间**: 2024-10-07  
 **维护者**: LifeTree 开发团队
-

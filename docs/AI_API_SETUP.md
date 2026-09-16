@@ -2,7 +2,7 @@
 
 ## 概述
 
-AI分析功能已集成阿里云百炼API，使用Moonshot-Kimi-K2-Instruct模型，用户无需输入API Key，直接点击按钮即可进行分析。
+AI分析功能已集成阿里云百炼兼容接口，使用Moonshot-Kimi-K2-Instruct模型。API Key 只在服务器环境变量中配置，浏览器和用户不应接触该密钥。
 
 ## 配置步骤
 
@@ -11,8 +11,8 @@ AI分析功能已集成阿里云百炼API，使用Moonshot-Kimi-K2-Instruct模�
 在您的 `.env` 文件中添加以下配置：
 
 ```bash
-# AI API配置 - 阿里云百炼
-AI_API_KEY="sk-c3d3d8211d2e4a70a4132631ec644e42"
+# AI API配置 - 阿里云百炼（必填，不要提交真实值）
+AI_API_KEY=""
 ```
 
 ### 2. 阿里云百炼API配置

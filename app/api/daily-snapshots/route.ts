@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/jwt'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 
 // GET /api/daily-snapshots - 获取用户的每日数据快照
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
 // POST /api/daily-snapshots - 创建每日数据快照
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },

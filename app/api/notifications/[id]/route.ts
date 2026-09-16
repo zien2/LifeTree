@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { extractTokenFromHeaders } from '@/lib/security-config'
 
 // PATCH /api/notifications/[id] - 标记通知为已读
 export async function PATCH(
@@ -8,7 +9,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -67,7 +68,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },
@@ -118,4 +119,3 @@ export async function DELETE(
     )
   }
 }
-

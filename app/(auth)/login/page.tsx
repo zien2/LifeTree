@@ -41,13 +41,6 @@ function LoginContent() {
       })
 
       if (response.data.success) {
-        // 保存 Token 和用户信息到localStorage
-        localStorage.setItem('token', response.data.data.token)
-        localStorage.setItem('user', JSON.stringify(response.data.data.user))
-
-        // 同时设置cookie，供中间件使用
-        document.cookie = `token=${response.data.data.token}; path=/; max-age=${response.data.data.expiresIn}; SameSite=Lax`
-
         message.success('登录成功！')
 
         // 获取重定向URL，如果没有则跳转到仪表板
@@ -78,15 +71,6 @@ function LoginContent() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // 快速填充测试账号
-  const fillTestAccount = () => {
-    form.setFieldsValue({
-      email: 'zhangsan@lifetree.com',
-      password: 'Test123456',
-    })
-    message.info('已填充测试账号')
   }
 
   // 重新发送验证邮件
@@ -257,32 +241,7 @@ function LoginContent() {
             </Space>
           </div>
 
-          {/* 测试账号快速登录 */}
-          <div style={{ textAlign: 'center' }}>
-            <Button 
-              type="link" 
-              onClick={fillTestAccount} 
-              size="small"
-              style={{ color: '#52c41a', fontWeight: 500 }}
-            >
-              使用测试账号
-            </Button>
-          </div>
         </Form>
-
-        <div
-          style={{
-            marginTop: '20px',
-            padding: '12px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
-        >
-          <Text style={{ fontSize: '12px', color: '#ffffff', opacity: 0.9 }}>
-            🧪 测试账号：zhangsan@lifetree.com / Test123456
-          </Text>
-        </div>
       </Card>
     </div>
   )
@@ -295,4 +254,3 @@ export default function LoginPage() {
     </Suspense>
   )
 }
-

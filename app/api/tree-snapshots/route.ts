@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+import { getAuthUserFromRequest } from '@/lib/auth'
+import {
+  decodeSnapshotImage,
+  getSnapshotFilePath,
+  getSnapshotStorageRoot,
+} from '@/lib/snapshot-security'
 
-const SNAPSHOT_DIR = path.join(process.cwd(), 'public', 'tree-snapshots')
+const SNAPSHOT_DIR = getSnapshotStorageRoot()
 
 function ensureDir(dirPath: string) {
   if (!fs.existsSync(dirPath)) {
@@ -12,19 +18,25 @@ function ensureDir(dirPath: string) {
 
 export async function GET(req: NextRequest) {
   try {
+    const authUser = await getAuthUserFromRequest(req)
+    if (!authUser) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(req.url)
     const year = searchParams.get('year')
     const month = searchParams.get('month') // 1-12
 
-    ensureDir(SNAPSHOT_DIR)
+    const userSnapshotDir = path.join(SNAPSHOT_DIR, authUser.id)
+    ensureDir(userSnapshotDir)
 
     // 列出所有文件，或按年/月过滤
     const result: Array<{ url: string; date: string; filename: string }> = []
 
-    const years = fs.readdirSync(SNAPSHOT_DIR, { withFileTypes: true }).filter(d => d.isDirectory())
+    const years = fs.readdirSync(userSnapshotDir, { withFileTypes: true }).filter(d => d.isDirectory())
     for (const y of years) {
       if (year && y.name !== year) continue
-      const yearDir = path.join(SNAPSHOT_DIR, y.name)
+      const yearDir = path.join(userSnapshotDir, y.name)
       const months = fs.readdirSync(yearDir, { withFileTypes: true }).filter(d => d.isDirectory())
       for (const m of months) {
         if (month && m.name !== month.padStart(2, '0')) continue
@@ -32,7 +44,7 @@ export async function GET(req: NextRequest) {
         const files = fs.readdirSync(monthDir, { withFileTypes: true }).filter(f => f.isFile())
         for (const f of files) {
           if (!f.name.toLowerCase().endsWith('.png') && !f.name.toLowerCase().endsWith('.jpg')) continue
-          const url = `/tree-snapshots/${y.name}/${m.name}/${f.name}`
+          const url = `/api/tree-snapshots/${authUser.id}/${y.name}/${m.name}/${f.name}`
           const basename = path.parse(f.name).name
           // 期望文件名格式: YYYYMMDD.png
           let date = basename
@@ -55,6 +67,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const authUser = await getAuthUserFromRequest(req)
+    if (!authUser) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await req.json()
     const { imageData, date } = body as { imageData: string; date?: string }
     if (!imageData || typeof imageData !== 'string') {
@@ -66,22 +83,19 @@ export async function POST(req: NextRequest) {
     const m = String(now.getMonth() + 1).padStart(2, '0')
     const d = String(now.getDate()).padStart(2, '0')
 
-    const targetDir = path.join(SNAPSHOT_DIR, y, m)
+    const targetDir = path.join(SNAPSHOT_DIR, authUser.id, y, m)
     ensureDir(targetDir)
 
-    const base64 = imageData.replace(/^data:image\/(png|jpeg);base64,/, '')
-    const buffer = Buffer.from(base64, 'base64')
+    const buffer = decodeSnapshotImage(imageData)
 
     const filename = `${y}${m}${d}.png`
-    const filePath = path.join(targetDir, filename)
+    const filePath = getSnapshotFilePath(authUser.id, y, m, filename, SNAPSHOT_DIR)
     fs.writeFileSync(filePath, buffer)
 
-    const url = `/tree-snapshots/${y}/${m}/${filename}`
+    const url = `/api/tree-snapshots/${authUser.id}/${y}/${m}/${filename}`
     return NextResponse.json({ url, filename })
   } catch (e) {
     console.error('Save snapshot error:', e)
     return NextResponse.json({ message: 'Save snapshot failed' }, { status: 500 })
   }
 }
-
-

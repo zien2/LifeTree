@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/jwt'
 import dayjs from 'dayjs'
+import { extractTokenFromHeaders } from '@/lib/security-config'
+
+export const dynamic = 'force-dynamic'
 
 // 创建一些测试计划数据
 export async function GET(request: NextRequest) {
   try {
     // 验证JWT token
-    const token = request.headers.get('authorization')?.split(' ')[1]
+    const token = extractTokenFromHeaders(request.headers)
     if (!token) {
       return NextResponse.json(
         { success: false, message: '未提供认证令牌' },

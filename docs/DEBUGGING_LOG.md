@@ -64,41 +64,17 @@ export function middleware(request: NextRequest) {
 **根本问题发现：**
 前端和后端使用不同的JWT验证逻辑：
 - **后端**：使用正确的`JWT_SECRET`验证token ✅
-- **前端**：使用默认值`'default-secret-key'`验证token ❌
+- **前端**：曾经尝试在浏览器端使用默认 JWT 值验证 token ❌
 
 **问题原因：**
 ```typescript
 // lib/jwt.ts
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET
 // 在浏览器环境中，process.env.JWT_SECRET 是 undefined
 ```
 
 **最终解决方案：**
-```typescript
-// lib/auth.ts - 移除前端JWT验证
-export function getAuthUser(): AuthUser | null {
-  if (typeof window === 'undefined') return null
-  
-  try {
-    const token = localStorage.getItem('token')
-    const userStr = localStorage.getItem('user')
-    
-    if (!token || !userStr) {
-      return null
-    }
-    
-    // 前端不验证JWT token，只检查是否存在
-    // JWT验证应该在后端进行
-    
-    // 解析用户信息
-    const user = JSON.parse(userStr)
-    return user
-  } catch (error) {
-    console.error('获取用户信息失败:', error)
-    return null
-  }
-}
-```
+JWT 不再由浏览器端解析或存储。服务端使用 `JWT_SECRET` 验证 HttpOnly Cookie，页面通过 `/api/auth/me` 获取当前用户。
 
 ### 关键学习点
 
@@ -143,7 +119,7 @@ the provided database credentials for `root` are not valid.
 3. **更新环境变量**
    ```env
    # .env
-   DATABASE_URL="mysql://root:Hzy0520.@localhost:3306/life-db"
+   DATABASE_URL="mysql://root:<MYSQL_ROOT_PASSWORD>@localhost:3306/life-db"
    ```
 
 ### 关键学习点

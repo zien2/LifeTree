@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUserFromRequest } from '@/lib/auth'
+import { getRequiredEnv } from '@/lib/security-config'
+import { validateChatContext } from '@/lib/ai-security'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,16 +25,23 @@ export async function POST(request: NextRequest) {
 
     // 检查是否是聊天模式
     if (data.chatContext) {
-      // 聊天模式：使用提供的聊天上下文
-      messages = data.chatContext
+      // 聊天模式：只接受有边界的用户/助手消息，避免调用方注入 system 指令。
+      messages = [
+        {
+          role: 'system',
+          content: '你是一位专业的时间管理和效率专家。基于对话上下文，简洁回答用户问题。'
+        },
+        ...validateChatContext(data.chatContext),
+      ]
     } else {
       // 分析模式：构建分析提示词
+      const recentPlans = Array.isArray(data.recentPlans) ? data.recentPlans.slice(0, 5) : []
       const prompt = `作为时间管理专家，分析用户计划数据并提供优化建议：
 
 数据概览：总计划${data.totalPlans}个，已完成${data.completedPlans}个，完成率${data.completionRate}%
 优先级：高${data.highPriorityPlans}个，中${data.mediumPriorityPlans}个，低${data.lowPriorityPlans}个
-最近计划：${data.recentPlans.slice(0, 5).map((plan: any) => 
-  `${plan.title}(${plan.priority === 'HIGH' ? '高' : plan.priority === 'MEDIUM' ? '中' : '低'},${plan.status === 'COMPLETED' ? '完成' : '进行中'})`
+最近计划：${recentPlans.map((plan: any) =>
+  `${String(plan?.title || '').slice(0, 200)}(${plan?.priority === 'HIGH' ? '高' : plan?.priority === 'MEDIUM' ? '中' : '低'},${plan?.status === 'COMPLETED' ? '完成' : '进行中'})`
 ).join('; ')}
 
 请从完成度、优先级管理、时间分配、效率优化4个维度分析，给出3-5个具体建议。控制在400-600字。`
@@ -49,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 调用阿里云百炼API
-    const aiApiKey = process.env.AI_API_KEY || 'sk-c3d3d8211d2e4a70a4132631ec644e42'
+    const aiApiKey = getRequiredEnv('AI_API_KEY')
     const aiApiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'
     
     // 创建AbortController用于超时控制

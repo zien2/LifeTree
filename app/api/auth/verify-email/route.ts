@@ -7,6 +7,8 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ApiResponse } from '@/lib/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // 获取验证令牌
@@ -69,4 +71,3 @@ export async function GET(request: NextRequest) {
     return ApiResponse.error('验证失败，请稍后重试', 500)
   }
 }
-

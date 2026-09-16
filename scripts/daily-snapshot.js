@@ -13,10 +13,18 @@
 const https = require('https')
 const http = require('http')
 
+function getRequiredEnv(name) {
+  const value = process.env[name]
+  if (!value || !value.trim()) {
+    throw new Error(`${name} is required`)
+  }
+  return value.trim()
+}
+
 // 配置
 const config = {
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3002',
-  cronToken: process.env.CRON_SECRET_TOKEN || 'lifetree-cron-2024',
+  cronToken: getRequiredEnv('CRON_SECRET_TOKEN'),
   timeout: 30000 // 30秒超时
 }
 
@@ -163,7 +171,7 @@ LifeTree 每日数据快照定时任务
 
 环境变量:
   NEXT_PUBLIC_BASE_URL    应用基础URL (默认: http://localhost:3002)
-  CRON_SECRET_TOKEN       定时任务密钥 (默认: lifetree-cron-2024)
+  CRON_SECRET_TOKEN       定时任务密钥（必填）
 
 定时任务设置:
   # 每日凌晨0点执行

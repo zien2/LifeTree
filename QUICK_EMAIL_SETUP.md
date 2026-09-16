@@ -195,7 +195,7 @@ curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
-    "password": "Test123456",
+    "password": "replace-with-a-unique-test-password",
     "name": "测试用户"
   }'
 ```
@@ -216,4 +216,3 @@ curl -X POST http://localhost:3000/api/auth/register \
 ---
 
 **需要帮助？** 告诉我您使用的是哪个邮箱，我可以提供更详细的指导！
-

@@ -74,7 +74,7 @@
 ```bash
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@lifetree.com","password":"Test123456","name":"测试用户"}'
+  -d '{"email":"test@lifetree.com","password":"replace-with-a-unique-test-password","name":"测试用户"}'
 ```
 
 ---
@@ -125,7 +125,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@lifetree.com","password":"Test123456"}'
+  -d '{"email":"test@lifetree.com","password":"replace-with-the-same-test-password"}'
 ```
 
 ---
@@ -647,25 +647,14 @@ No Content
 1. 用户输入邮箱密码 → 前端验证
 2. 发送 POST /api/auth/login
 3. 后端验证 → 生成 JWT Token
-4. 前端存储 Token (localStorage)
-5. 后续请求携带 Authorization: Bearer {token}
+4. 服务端设置 HttpOnly、SameSite Cookie
+5. 后续同源请求自动携带 Cookie
 6. 后端中间件验证 Token
 ```
 
 ### Token 存储方案
 
-```typescript
-// 存储 Token
-localStorage.setItem('token', token)
-localStorage.setItem('user', JSON.stringify(user))
-
-// 读取 Token
-const token = localStorage.getItem('token')
-
-// 清除 Token（登出）
-localStorage.removeItem('token')
-localStorage.removeItem('user')
-```
+JWT 不暴露给浏览器 JavaScript，而是由服务端写入 HttpOnly Cookie。客户端通过 `/api/auth/me` 获取用户资料，通过 `/api/auth/logout` 清除会话。
 
 ### API 请求封装
 
@@ -674,11 +663,8 @@ localStorage.removeItem('user')
 const API_BASE_URL = '/api'
 
 async function request(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token')
-  
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   }
 
@@ -744,4 +730,3 @@ async function request(url: string, options: RequestInit = {}) {
 
 **最后更新**: 2024-10-07  
 **维护者**: LifeTree 开发团队
-

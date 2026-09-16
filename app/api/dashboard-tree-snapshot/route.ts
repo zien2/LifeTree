@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
-import { getAuthUser } from '@/lib/auth'
+import { getAuthUserFromRequest } from '@/lib/auth'
+import {
+  decodeSnapshotImage,
+  getSnapshotFilePath,
+  getSnapshotStorageRoot,
+} from '@/lib/snapshot-security'
 
 export async function POST(request: Request) {
-  const authUser = await getAuthUser()
+  const authUser = await getAuthUserFromRequest(request)
   if (!authUser) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
@@ -17,24 +22,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Image data and date are required' }, { status: 400 })
     }
 
-    const base64Data = imageData.replace(/^data:image\/png;base64,/, '')
-    const buffer = Buffer.from(base64Data, 'base64')
+    const buffer = decodeSnapshotImage(imageData)
 
     const snapshotDate = dayjs(date)
     const year = snapshotDate.format('YYYY')
     const month = snapshotDate.format('MM')
     const filename = snapshotDate.format('YYYYMMDD') + '.png'
 
-    const yearDir = path.join(process.cwd(), 'public', 'tree-snapshots', year)
+    const storageRoot = getSnapshotStorageRoot()
+    const yearDir = path.join(storageRoot, authUser.id, year)
     const monthDir = path.join(yearDir, month)
-    const filePath = path.join(monthDir, filename)
+    const filePath = getSnapshotFilePath(authUser.id, year, month, filename, storageRoot)
 
     await fs.mkdir(monthDir, { recursive: true })
     await fs.writeFile(filePath, buffer)
 
     return NextResponse.json({ 
       message: 'Dashboard tree snapshot saved successfully', 
-      url: `/tree-snapshots/${year}/${month}/${filename}`,
+      url: `/api/tree-snapshots/${authUser.id}/${year}/${month}/${filename}`,
       filename: filename
     })
   } catch (error) {

@@ -9,7 +9,8 @@
 ### 1. 自动快照保存
 - **时间**: 每天凌晨00:05自动执行
 - **内容**: 截取主页的生命树Canvas区域
-- **存储**: 按年/月/日组织存储在 `public/tree-snapshots/` 目录
+- **存储**: 按用户/年/月/日组织存储在私有 `data/tree-snapshots/` 目录
+- **访问控制**: 图片只通过已认证的 `/api/tree-snapshots/...` 接口读取
 - **格式**: PNG图片文件
 
 ### 2. 日历视图展示
@@ -21,12 +22,13 @@
 ## 文件结构
 
 ```
-public/tree-snapshots/
-├── 2025/
-│   └── 10/
-│       ├── 20251006.png
-│       ├── 20251007.png
-│       └── 20251008.png
+data/tree-snapshots/
+├── <user-id>/
+│   └── 2025/
+│       └── 10/
+│           ├── 20251006.png
+│           ├── 20251007.png
+│           └── 20251008.png
 ```
 
 ## 技术实现
@@ -48,8 +50,12 @@ public/tree-snapshots/
 
 ### 1. 手动测试截图
 ```bash
+export TREE_SNAPSHOT_TOKEN='<该用户当前有效的 JWT>'
 npm run cron:tree-snapshot
 ```
+
+`TREE_SNAPSHOT_TOKEN` 仅通过部署环境注入，不要写入脚本、文档或 Git。也可用
+`SNAPSHOT_STORAGE_DIR` 指定私有存储目录；默认值为 `data/tree-snapshots/`。
 
 ### 2. 设置自动定时任务
 ```bash
@@ -76,7 +82,7 @@ node scripts/setup-cron.js
 - 查看日志文件 `logs/tree-snapshot.log`
 
 ### 快照不显示
-- 检查 `public/tree-snapshots/` 目录权限
+- 检查 `data/tree-snapshots/`（或 `SNAPSHOT_STORAGE_DIR`）目录权限
 - 确认API接口正常工作
 - 刷新页面重新加载快照列表
 

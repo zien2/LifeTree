@@ -2,7 +2,6 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, validatePasswordStrength } from '@/lib/password'
 import { validateEmail, sanitizeInput } from '@/lib/validation'
-import { signToken } from '@/lib/jwt'
 import {
   successResponse,
   errorResponse,
@@ -101,17 +100,9 @@ export async function POST(request: NextRequest) {
       console.warn('⚠️  验证邮件发送失败，但用户已创建成功')
     }
 
-    // 11. 生成 JWT Token
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-    })
-
-    // 12. 返回用户信息和 Token
+    // 11. 返回用户信息；邮箱验证完成后再通过登录建立会话
     const responseData: any = {
       user,
-      token,
-      expiresIn: 604800, // 7天（秒）
       emailVerificationSent: emailResult.success,
     }
 
@@ -131,4 +122,3 @@ export async function POST(request: NextRequest) {
     return serverErrorResponse('注册失败，请稍后重试')
   }
 }
-

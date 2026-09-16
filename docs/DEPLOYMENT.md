@@ -127,8 +127,9 @@ git push -u origin main
    # JWT 密钥（使用强随机字符串）
    JWT_SECRET=your-super-secret-jwt-key-min-32-chars
    
-   # OpenAI（可选）
-   OPENAI_API_KEY=sk-your-openai-api-key
+   # DashScope（AI 功能需要；不要提交真实值）
+   AI_API_KEY=
+   CRON_SECRET_TOKEN=
    
    # Node 环境
    NODE_ENV=production
@@ -285,7 +286,8 @@ services:
     environment:
       DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/life_db
       JWT_SECRET: ${JWT_SECRET}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AI_API_KEY: ${AI_API_KEY:-}
+      CRON_SECRET_TOKEN: ${CRON_SECRET_TOKEN:?CRON_SECRET_TOKEN must be set}
       NODE_ENV: production
     depends_on:
       mysql:
@@ -306,7 +308,8 @@ networks:
 ```env
 MYSQL_ROOT_PASSWORD=your_strong_password
 JWT_SECRET=your-super-secret-jwt-key
-OPENAI_API_KEY=sk-your-openai-api-key
+AI_API_KEY=
+CRON_SECRET_TOKEN=
 ```
 
 ### 步骤 5: 启动服务
@@ -610,7 +613,7 @@ DATABASE_URL="mysql://root:password@localhost:3306/life_db"
 JWT_SECRET="dev-secret-key"
 
 # OpenAI
-OPENAI_API_KEY="sk-your-dev-api-key"
+AI_API_KEY=""
 
 # 日志级别
 LOG_LEVEL="debug"
@@ -626,7 +629,7 @@ DATABASE_URL="mysql://user:password@host:3306/life_db?connection_limit=10"
 JWT_SECRET="production-super-secret-key-min-32-characters"
 
 # OpenAI
-OPENAI_API_KEY="sk-your-prod-api-key"
+AI_API_KEY=""
 
 # Node 环境
 NODE_ENV="production"
@@ -868,4 +871,3 @@ pm2 reload lifetree --update-env
 **文档版本**: v1.0.0  
 **最后更新**: 2024年10月7日  
 **维护者**: LifeTree DevOps Team
-

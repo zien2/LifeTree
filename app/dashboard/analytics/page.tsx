@@ -90,10 +90,7 @@ export default function AnalyticsPage() {
   const fetchPlans = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-      const response = await axios.get('/api/plans', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await axios.get('/api/plans')
       
       if (response.data.success) {
         const allPlans = response.data.data.plans
@@ -171,12 +168,8 @@ export default function AnalyticsPage() {
   // 导出Excel功能
   const exportToExcel = async () => {
     try {
-      const token = localStorage.getItem('token')
-      
       // 获取所有计划数据
-      const plansResponse = await axios.get('/api/plans', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const plansResponse = await axios.get('/api/plans')
       
       if (!plansResponse.data.success) {
         message.error('获取计划数据失败')
@@ -242,24 +235,11 @@ export default function AnalyticsPage() {
     setChatMessages(newMessages)
 
     try {
-      const token = localStorage.getItem('token')
-      
-      // 构建聊天上下文，包含原始分析结果
-      const chatContext = [
-        {
-          role: 'system',
-          content: '你是时间管理专家。基于之前的分析结果，简洁回答用户问题。'
-        },
-        {
-          role: 'user',
-          content: `分析结果：${aiAnalysisResult.substring(0, 500)}...\n\n问题：${userMessage}`
-        }
-      ]
+      // 只提交 user/assistant 历史消息；system 指令由服务端固定注入。
+      const chatContext = newMessages.slice(-20)
 
       const response = await axios.post('/api/ai-analysis', {
         data: { chatContext }
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       })
 
       if (response.data.success) {
@@ -283,12 +263,8 @@ export default function AnalyticsPage() {
       setAiAnalysisLoading(true)
       setAiAnalysisResult('')
       
-      const token = localStorage.getItem('token')
-      
       // 获取所有计划数据
-      const plansResponse = await axios.get('/api/plans', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const plansResponse = await axios.get('/api/plans')
       
       if (!plansResponse.data.success) {
         message.error('获取计划数据失败')
@@ -317,8 +293,6 @@ export default function AnalyticsPage() {
       // 调用AI分析API
       const aiResponse = await axios.post('/api/ai-analysis', {
         data: analysisData
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       })
       
       if (aiResponse.data.success) {
